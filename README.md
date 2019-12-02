@@ -2,7 +2,7 @@
 
 [![Build status](https://dev.azure.com/zementis-ai/Repo/_apis/build/status/Repo-CI)](https://dev.azure.com/zementis-ai/Repo/_build/latest?definitionId=4)
 
-The spirit of Machine Learning and Deep Learning.
+The spirit of Machine Learning and Deep Learning
 
 Versioning resource(like model, data and code) and manage its dependencies for ai projects.
 
