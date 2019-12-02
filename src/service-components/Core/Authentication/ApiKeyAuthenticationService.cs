@@ -1,0 +1,29 @@
+using System;
+using System.Threading.Tasks;
+using Umoya.Core.Configuration;
+using Microsoft.Extensions.Options;
+
+namespace Umoya.Core.Authentication
+{
+    public class ApiKeyAuthenticationService : IAuthenticationService
+    {
+        private readonly string _apiKey;
+
+        public ApiKeyAuthenticationService(IOptionsSnapshot<UmoyaOptions> options)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            _apiKey = string.IsNullOrEmpty(options.Value.ApiKey) ? null : options.Value.ApiKey;
+        }
+
+        public Task<bool> AuthenticateAsync(string apiKey) => Task.FromResult(Authenticate(apiKey));
+
+        private bool Authenticate(string apiKey)
+        {
+            // No authentication is necessary if there is no required API key.
+            if (_apiKey == null) return true;
+
+            return _apiKey == apiKey;
+        }
+    }
+}
