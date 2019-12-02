@@ -21,17 +21,17 @@ For more information, Please refer to [our documentation](https://zmod.org/).
 * Lightweight Server : Repo Server
 * Client Tools : CLI, Browser and Rest APIs to perform operations like add, upgrade, delete and publish resources.
 * Cross-platform (i.e. You can use Sever/Client Tools on Windows, Linux or Mac OS)
-* Dockerized (Coming Soon)
-* Authenticate and Authorize with Software AG ZMOD's Identity Server (i.e. OAuth 2.0 RedHat KeyCloak) (Coming Soon)
+* Dockerized
+* Authenticate and Authorize with Software AG ZMOD's Identity Server (i.e. OAuth 2.0 RedHat KeyCloak)
 * Supports read-through caching, It can index the entire resources.
 * Stay tuned, more features are planned with Software AG ZMOD.
 
 ## Develop
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download) and [Node.js](https://nodejs.org/)
 2. Do clone of master branch.
-3. Navigate to `.\Repo\src\Repo\ClientApps\UI`
+3. Navigate to `clients\UI\src`
 4. Install the frontend's dependencies with `npm install`
-5. Navigate to `..\Repo`
+5. Navigate to `service-components\Umoya`
 6. Start the service with `dotnet run`
 7. Open the URL `http://localhost:8007/` in your browser
 
