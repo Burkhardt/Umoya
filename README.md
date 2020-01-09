@@ -28,7 +28,7 @@ For more information, Please refer to [our documentation](https://zmod.org/).
 * Supports read-through caching, It can index the entire resources.
 * Stay tuned, more features are planned with Software AG ZMOD.
 
-## Develop
+## Development
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download) and [Node.js](https://nodejs.org/)
 2. Do clone of master branch.
 3. Navigate to `clients\UI\src`
@@ -44,7 +44,7 @@ For more information, Please refer to [our documentation](https://zmod.org/).
 Releases are automated from the master branch, executed by [DevOps pipeline](https://dev.azure.com/zementis-ai/Umoya/_release?definitionId=1&view=mine&_a=releases), release is published only if all tests have passed along with prod go / no go strategies.
 
 ## Submitting patches
-1. Fork and create branch.
+1. Fork or create branch.
 2. Commit your changes.
 3. Submit a PR, DevOps pipeline will run all tests.
 4. Address issues in the review and build failures.
