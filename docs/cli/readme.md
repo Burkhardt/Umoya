@@ -22,6 +22,14 @@
         umoya publish HelloWorld.pmml@1.0.0 --description "Hello World Model" --using HelloWorldCode.ipynb@1.0.0,HelloWorldData.csv@1.0.0
         
 
+## Add resource(s)
+        umoya add HelloWorld.pmml
+        umoya add HelloWorld.pmml@2.0.0
+        
+## Remove resource(s)
+        umoya add HelloWorld.pmml
+        umoya add HelloWorld.pmml@2.0.0
+        
 ## List your local resources
         umoya list [options]
         umoya list --class Model
