@@ -34,7 +34,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //2. User has initialized ZMOD.    Folders are created in ZMODHome/Models , Code  Data 
         //3. Captured expected output.      
         #endregion
-        [Fact]
+       // [Fact]
         public void LocalListWithBaselineResourcesTest()
         {
             string TestScenariosName = "LocalListWithBaselineResourcesTest";
@@ -80,7 +80,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Baseline    
         //1. Repo has HelloWorld.pmml@1.0.0, HelloWorldCode.ipynb@1.0.0 and HelloWorldData.csv@1.0.0
 
-        [Fact]
+        //[Fact]
         public void RepoListWithBaselineResourcesTest()
         {
             #region Setup

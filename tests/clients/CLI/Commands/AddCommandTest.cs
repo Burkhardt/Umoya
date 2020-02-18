@@ -27,7 +27,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorld.pmml@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-        [Fact]
+       // [Fact]
         #endregion
         public void ResourceModelPresentInRepoTest()
         {
@@ -62,7 +62,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldCode.ipynb@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-        [Fact]
+       // [Fact]
         #endregion
         public void ResourceCodePresentInRepoTest()
         {
@@ -90,7 +90,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldData.csv@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-        [Fact]
+       // [Fact]
         #endregion
         public void ResourceDataPresentInRepoTest()
         {

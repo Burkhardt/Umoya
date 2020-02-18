@@ -34,7 +34,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         // 2. Capture the Expected Output
         #endregion
 
-        [Fact]
+       // [Fact]
         public void WithDefaultConfigurationsPresentInfoTest()
         {
             #region Setup
