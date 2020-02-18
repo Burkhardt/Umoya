@@ -58,7 +58,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             string OutputDiff = string.Empty;
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-
+TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
