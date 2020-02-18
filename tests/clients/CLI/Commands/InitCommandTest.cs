@@ -101,6 +101,7 @@ namespace Repo.Clients.CLI.Commands.Tests
 
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
+            TestAPIs.StopRepo();
             #endregion
         }
         #endregion
