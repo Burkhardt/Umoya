@@ -112,6 +112,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             //Start Repo 
             try
             {
+                System.Console.WriteLine(RepoPath);
                 RepoProcess = new Process();
                 RepoProcess.StartInfo.FileName = DotNetCommand;
                 RepoProcess.StartInfo.Arguments = ArgumentName;
@@ -119,6 +120,7 @@ namespace Repo.Clients.CLI.Commands.Tests
                 RepoProcess.StartInfo.CreateNoWindow = true;
                 RepoProcess.StartInfo.WorkingDirectory = RepoPath;
                 RepoProcess.Start();
+                System.Console.WriteLine("Process started");
                 return true;
             }
             catch
