@@ -112,7 +112,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             //Start Repo 
             try
             {
-                System.Console.WriteLine(RepoPath);
+                System.Console.WriteLine("SurbhiRepoPath "+RepoPath);
                 RepoProcess = new Process();
                 RepoProcess.StartInfo.FileName = DotNetCommand;
                 RepoProcess.StartInfo.Arguments = ArgumentName;
