@@ -1,9 +1,11 @@
-## Usecase(s)
+## Use Case
+You want to install Umoya CLI Tool and perform various action like publish, add, query etc.<br/>
 
-1. Install Umoya CLI Tool and configure once
-2. Publish resource(s)
-3. Add resource(s) from Repo to local resource directory (ZMOD)
-4. Delete resource(s) from local resource directory (ZMOD)
-5. Query Resource(s) of local resource directory(ZMOD) or Repo server.
-6. Upgrade Umoya CLI Tool
-7. UnInstall Umoya
+Note :<br/>
+Check you have pre-requisites with the system where you want to install Umoya CLI tool.
+
+### Steps
+* Go to command line or terminal and perform below command<br/>
+  dotnet tool install -g umoya --add-source https://hub.mlw.ai/v3/index.json
+
+* Verify that You have successfully installed UMOYA on your sytem. Type command "umoya"   
