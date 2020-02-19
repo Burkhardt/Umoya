@@ -37,7 +37,7 @@ namespace Repo.Clients.CLI
         {
             this.SourceEndPoint = EndPoint;
             this.DownloadFilePath = DownloadFilePath;
-            Logger.Do("Started downloading " + this.SourceEndPoint);
+            if(ShowProgressInfo) Logger.Do("Started downloading " + this.SourceEndPoint);
             this.DownloadFileName = this.DownloadFilePath.Substring(this.DownloadFilePath.LastIndexOfAny(new char[] {Constants.PathSeperator}) + 1);
             this.DownloadFileName = this.DownloadFileName.Replace(".nupkg", string.Empty);
             this.ShowProgress = ShowProgressInfo;
@@ -91,17 +91,33 @@ namespace Repo.Clients.CLI
 
         public void CleanProgressInfo()
         {
-            System.Console.Write("\r" + new string(' ', System.Console.WindowWidth) + "\r");
+            if(this.ShowProgress) System.Console.Write("\r" + new string(' ', System.Console.WindowWidth) + "\r");
         }
 
         public void PrintProgressInfo()
         {
-            System.Console.Write("\r  >> {0} {1} downloaded {2} of {3} bytes. [{4} %]",
-                    this.DownloadFileName,
-                    this.DownloadByteStatus,
-                    this.DownloadedBytes,
-                    this.TotalBytes,
-                    this.ProgressPercentage);
+            if(this.ShowProgress)
+            {
+                System.Console.Write("\r  >> {0} {1} downloaded {2} of {3} bytes. [{4} %]",
+                        this.DownloadFileName,
+                        this.DownloadByteStatus,
+                        this.DownloadedBytes,
+                        this.TotalBytes,
+                        this.ProgressPercentage);
+            }
+        }
+
+        public void Cancel()
+        {
+            try
+            {
+                this.IsCancelled = true;
+                this.Client.CancelAsync();
+                this.Client.Dispose();
+                this.Client = null;
+            }            
+            catch(Exception ex){this.Client = null;}
+
         }
     }
 }

@@ -107,6 +107,7 @@ namespace Repo.Clients.CLI.Commands
                     Logger.Do("Clearning Temp Cache for Nuget " + ClearCacheCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo);
                     ClearCacheCommandString = "nuget locals http-cache -c";
+                    Resources.DoCacheCleanUpIfNeeded();
                     Logger.Do("Clearning Temp Cache for Nuget " + ClearCacheCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo);
                     #endregion

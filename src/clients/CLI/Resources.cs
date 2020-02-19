@@ -542,7 +542,7 @@ namespace Repo.Clients.CLI
             Downloader ResourceDownloaderInstance = null;
             if(!File.Exists(TempDestinationFile)) 
             {
-                ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile, true);
+                ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile, Info.Instance.ShowProgress);
                 WaitForDownloadCompletion(ref ResourceDownloaderInstance);
             }
             foreach(KeyValuePair<string, ResourceIdentifier> KeyPair in ResourceId.Dependencies)
@@ -552,7 +552,7 @@ namespace Repo.Clients.CLI
                 TempDestinationFile = DownloadFolderPath + Constants.PathSeperator + ResourceResourceFileName;
                 if(!File.Exists(TempDestinationFile))
                 {
-                    ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile);
+                    ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile, Info.Instance.ShowProgress);
                     WaitForDownloadCompletion(ref ResourceDownloaderInstance);
                 }
             }
@@ -561,14 +561,23 @@ namespace Repo.Clients.CLI
         public static void WaitForDownloadCompletion(ref Downloader DownloaderInstance)
         {
             for (; ; )
-            {
-                System.Threading.Thread.Sleep(100);
+            {                
+                System.Threading.Thread.Sleep(100);                
                 DownloaderInstance.PrintProgressInfo();
-                if (DownloaderInstance.Status)
+                if (DownloaderInstance.Status || PSOps.UserRequestToStop)
                 {
                     DownloaderInstance.CleanProgressInfo();
                     break;
                 }
+            }
+            if(PSOps.UserRequestToStop) 
+            {
+                DownloaderInstance.Cancel();                    
+                if(File.Exists(DownloaderInstance.DownloadFilePath))
+                {
+                    LogCacheCleanUpOffCycle(DownloaderInstance.DownloadFilePath);
+                }                    
+                throw new Exception("User has stopped while downloading resource : " + DownloaderInstance.DownloadFileName);                    
             }
         }
 
@@ -576,5 +585,24 @@ namespace Repo.Clients.CLI
         {
             return ResourceId.ResourceName.ToLower() + "." + ResourceId.Version + ".nupkg";
         }
+
+        private static void LogCacheCleanUpOffCycle(string FileName)
+        {
+            File.WriteAllText(Constants.DefaultResourceCacheCleanupToDoFile, FileName);
+        }
+
+        public static void DoCacheCleanUpIfNeeded()
+        {
+            try
+            {
+                if(File.Exists(Constants.DefaultResourceCacheCleanupToDoFile))
+                {
+                    File.Delete(File.ReadAllText(Constants.DefaultResourceCacheCleanupToDoFile));
+                    File.Delete(Constants.DefaultResourceCacheCleanupToDoFile);
+                }
+            }
+            catch(Exception ex){Logger.Do("DoCacheCleanUpIfNeeded " + ex.StackTrace);}
+        }
+
     }
 }

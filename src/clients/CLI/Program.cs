@@ -21,12 +21,17 @@ namespace Repo.Clients.CLI
         static int Main(string[] args)
         {
             int commandResult = 0;
+            System.Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelEventHandler);
             if (args.Count() > 0) commandResult = RunApp(args).GetAwaiter().GetResult();
             else commandResult = Console.PrintListOfActions();
             return commandResult;
         }
 
-    
+        protected static void CancelEventHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            System.Console.WriteLine("\nThe operation has been interrupted.");
+            PSOps.UserRequestToStop = true;
+        }
 
         private static async Task<int> RunApp(string[] args)
         {

@@ -38,7 +38,7 @@ namespace Repo.Clients.CLI
         public string Version { get; set; }
         public SourceInfo Source { get; set; }
         public bool ISDebugging = false;
-
+        public bool ShowProgress = true;
         public Info(string ZMODPath)
         {
             dynamic jsonObject = JsonConvert.DeserializeObject(File.ReadAllText(ZMODPath));
@@ -51,6 +51,7 @@ namespace Repo.Clients.CLI
             if (jsonObject.Source.Accesskey != null) src.Accesskey = jsonObject.Source.Accesskey;
             this.Source = src;
             this.ISDebugging = jsonObject.ISDebugging;
+            this.ShowProgress = jsonObject.ShowProgress;
         }
 
         public Info()
@@ -72,6 +73,26 @@ namespace Repo.Clients.CLI
             if (!String.IsNullOrEmpty(url))
                 src.Url = url;
             this.Source = src;
+
+        }
+
+        public Info(string umoya, string zmode, string owner, string url, string accesskey , bool ISDebugging, bool ShowProgress)
+        {
+            if (!String.IsNullOrEmpty(umoya))
+                UmoyaHome = umoya;
+            if (!String.IsNullOrEmpty(zmode))
+                ZmodHome = zmode;
+            if (!String.IsNullOrEmpty(owner))
+                Owner = owner;
+            Version = GetVersion();
+            SourceInfo src = new SourceInfo();
+            if (!String.IsNullOrEmpty(accesskey))
+                src.Accesskey = accesskey;
+            if (!String.IsNullOrEmpty(url))
+                src.Url = url;
+            this.Source = src;
+            this.ISDebugging = ISDebugging;
+            this.ShowProgress = ShowProgress;
         }
         private static string GetVersion()
                 => typeof(Info).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
@@ -81,6 +102,8 @@ namespace Repo.Clients.CLI
         {
             bool status = false;
             Info info = new Info(umoyaHome, zmodHome, owner, null, null);
+            info.ShowProgress = true;
+            info.ISDebugging = false;
             string JSONresult = SerializeFile(info);
             string path = Constants.ConfigFileName;
             if (!File.Exists(path))
@@ -101,7 +124,7 @@ namespace Repo.Clients.CLI
                 Info info = new Info(umoyaHome, zmodHome, owner, null, null);
                 string JSONresult = JsonConvert.SerializeObject(info);
                 dynamic jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(JSONresult);
-                jsonObject.UmoyaHome = umoyaHome;
+                jsonObject.UmoyaHome = umoyaHome;                
                 jsonObject.Owner = owner;
                 var modifiedJsonString = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject);
                 // Logger.Do(modifiedJsonString);
@@ -137,6 +160,7 @@ namespace Repo.Clients.CLI
                     if (jsonObject.Source.Accesskey != null) src.Accesskey = jsonObject.Source.Accesskey;
                     this.Source = src;
                     this.ISDebugging = jsonObject.ISDebugging;
+                    this.ShowProgress = jsonObject.ShowProgress;
                 }
                 else
                 {

@@ -149,14 +149,16 @@ namespace Repo.Clients.CLI
             return typeof(Console).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         }
 
-        public static int SetInfoConfigurationValues(string RepoSourceURL, string Accesskey, string ISDebugging, string Owner)
+        public static int SetInfoConfigurationValues(string RepoSourceURL, string Accesskey, string Owner, bool ISDebugging ,bool ShowProgress)
         {
             try
             {
+                Logger.Do("Command : Info SetInfoConfigurationValues");
                 if (IsZMODConfigured())
                 {
                     // bool Status = bool.Parse(StatusInString);
-                    FSOps.UpdateInfoValue(RepoSourceURL, Accesskey, ISDebugging, Owner);
+                    Logger.Do("SetInfoConfigurationValues " +  RepoSourceURL + "  " + Accesskey + "  " + ISDebugging + " " +Owner  +"  " + ShowProgress);
+                    FSOps.UpdateInfoValue(RepoSourceURL, Accesskey, Owner, ISDebugging ,ShowProgress);
                     return 1;
                 }
                 else throw new Exceptions.ConfigurationNotFoundException();
@@ -177,6 +179,7 @@ namespace Repo.Clients.CLI
             else System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + "No Repo URL exists. You can update this with CLI umoya info -u <repo url>");
             if (Info.Instance.Source.Accesskey != null && Info.Instance.Source.Accesskey != "") System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + Info.Instance.Source.Accesskey);
             else System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + "No Key found; You need to set with CLI umoya info -k <your key>");
+            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "ShowProgress") + "\t : " + Info.Instance.ShowProgress);
             System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "IsDebugging") + "\t : " + Info.Instance.ISDebugging);
             System.Console.WriteLine();
         }

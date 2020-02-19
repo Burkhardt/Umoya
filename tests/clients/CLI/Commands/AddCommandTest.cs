@@ -12,7 +12,8 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             #region Check and start the repo server, if not already started.
             if (!TestAPIs.IsRepoRunning())
-            {
+            { //UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
                 Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
@@ -27,7 +28,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorld.pmml@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-       // [Fact]
+        [Fact]
         #endregion
         public void ResourceModelPresentInRepoTest()
         {
@@ -39,7 +40,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(TestAPIs.InitZMOD(ZMODPath), "ZMOD init failed.");
             #endregion
             #region Run command and capture output
-            string ResourceToAdd =  "HelloWorld.pmml";
+            string ResourceToAdd = "HelloWorld.pmml";
             string ResourceVersion = "1.0.0";
             TestAPIs.CaptureConsoleOutPut("add", ResourceToAdd + "@" + ResourceVersion, ZMODPath, Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt");
             #endregion
@@ -62,7 +63,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldCode.ipynb@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-       // [Fact]
+       [Fact]
         #endregion
         public void ResourceCodePresentInRepoTest()
         {
@@ -90,7 +91,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldData.csv@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-       // [Fact]
+        [Fact]
         #endregion
         public void ResourceDataPresentInRepoTest()
         {

@@ -14,14 +14,17 @@ namespace Repo.Clients.CLI.Commands.Tests
             //Check repo is running
             //If not then need to start repo.
             //Need to setup baseline in repo publish folder.
-          //  Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
-           #region Check and start the repo server, if not already started.
-             if (!TestAPIs.IsRepoRunning())
+            //  Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
+            #region Check and start the repo server, if not already started.
+            if (!TestAPIs.IsRepoRunning())
             {
+                //UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
+
+                System.Console.WriteLine("Repo is not started. Need to start Repo.");
                 Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
-
             Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             //Copy repo-resources from umoya-testdata to repo publish folder
             Assert.True(TestAPIs.SetUpRepoServer(), "Failed to setup resources and db for repo.");
@@ -34,7 +37,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         // 2. Capture the Expected Output
         #endregion
 
-       // [Fact]
+        [Fact]
         public void WithDefaultConfigurationsPresentInfoTest()
         {
             #region Setup
@@ -75,6 +78,9 @@ namespace Repo.Clients.CLI.Commands.Tests
 
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
+            #endregion
+            #region Stop Server
+            //TestAPIs.StopRepo();
             #endregion
         }
     }

@@ -15,10 +15,11 @@ namespace Repo.Clients.CLI.Commands.Tests
             //Check repo is running
             //If not then need to start repo.
             //Need to setup baseline in repo publish folder.
-           // Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
+            // Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             #region Check and start the repo server, if not already started.
-             if (!TestAPIs.IsRepoRunning())
-            {
+            if (!TestAPIs.IsRepoRunning())
+            {//UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
                 Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
@@ -34,7 +35,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //2. User has initialized ZMOD.    Folders are created in ZMODHome/Models , Code  Data 
         //3. Captured expected output.      
         #endregion
-       // [Fact]
+        [Fact]
         public void LocalListWithBaselineResourcesTest()
         {
             string TestScenariosName = "LocalListWithBaselineResourcesTest";
@@ -50,6 +51,13 @@ namespace Repo.Clients.CLI.Commands.Tests
             string ResourceToAdd = "HelloWorldCode.ipynb";
             string ResourceVersion = "1.0.0";
             TestAPIs.CaptureConsoleOutPut("add", ResourceToAdd + "@" + ResourceVersion, ZMODPath, Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt");
+
+            ResourceToAdd = "HelloWorld.pmml";
+            TestAPIs.CaptureConsoleOutPut("add", ResourceToAdd + "@" + ResourceVersion, ZMODPath, Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt");
+
+            ResourceToAdd = "HelloWorldData.csv";
+            TestAPIs.CaptureConsoleOutPut("add", ResourceToAdd + "@" + ResourceVersion, ZMODPath, Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt");
+
             #endregion
 
             #region verify the resources available on local ans store in expected output file
@@ -73,6 +81,9 @@ namespace Repo.Clients.CLI.Commands.Tests
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
+            #region Stop Server
+            //TestAPIs.StopRepo();
+            #endregion stop server
 
         }
 
@@ -80,7 +91,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Baseline    
         //1. Repo has HelloWorld.pmml@1.0.0, HelloWorldCode.ipynb@1.0.0 and HelloWorldData.csv@1.0.0
 
-        //[Fact]
+        [Fact]
         public void RepoListWithBaselineResourcesTest()
         {
             #region Setup
@@ -112,6 +123,9 @@ namespace Repo.Clients.CLI.Commands.Tests
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
+            #region Stop Server
+            //TestAPIs.StopRepo();
+            #endregion stop server
         }
         #endregion
     }

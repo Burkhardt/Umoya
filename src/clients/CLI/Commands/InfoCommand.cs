@@ -26,9 +26,12 @@ namespace Repo.Clients.CLI.Commands
         [Option("-o|--owner", "Set default Owner(s) of the resource (Optional).", CommandOptionType.SingleValue)]
         public string Owner { get; set; }
 
-        [Option("-d|--debug", "Set ISDebugging.", CommandOptionType.SingleValue)]
-        public string ISDebugging { get; set; }
+        [Option("-sp|--show-progress", "Show progress when resource is downloading. (Default : true)", CommandOptionType.SingleValue)]
+        public string ShowProgress { get; set; }
 
+        [Option("-d|--debug", "Set debugging flag. (Default : false)", CommandOptionType.SingleValue)]
+        public string ISDebugging { get; set; }
+        
         private async Task OnExecuteAsync()
         {
             Logger.Do("Command : Info is in process");
@@ -39,19 +42,22 @@ namespace Repo.Clients.CLI.Commands
                     bool NeedToUpdateRepoSourceURL = !String.IsNullOrEmpty(RepoSourceURL);
                     bool NeedToUpdateAccesskey = !String.IsNullOrEmpty(Accesskey);
                     bool NeedToUpdateISDebugging = !String.IsNullOrEmpty(ISDebugging);
+                    bool NeedToUpdateProgressStatus = !String.IsNullOrEmpty(ShowProgress);
                     bool NeedToUpdateOwner = !String.IsNullOrEmpty(Owner);
-                    bool NeedToUpdateAnyField = NeedToUpdateRepoSourceURL || NeedToUpdateAccesskey || NeedToUpdateISDebugging || NeedToUpdateOwner;
+                    bool NeedToUpdateAnyField = NeedToUpdateRepoSourceURL || NeedToUpdateAccesskey || NeedToUpdateISDebugging || NeedToUpdateOwner || NeedToUpdateProgressStatus;
                     if (NeedToUpdateAnyField)
                     {
                         RepoSourceURL = NeedToUpdateRepoSourceURL ? RepoSourceURL : Info.Instance.Source.Url;
                         Accesskey = NeedToUpdateAccesskey ? Accesskey : Info.Instance.Source.Accesskey;
                         ISDebugging = NeedToUpdateISDebugging ? ISDebugging : Info.Instance.ISDebugging.ToString();
+                        ShowProgress = NeedToUpdateProgressStatus ? ShowProgress : Info.Instance.ShowProgress.ToString();
                         Owner = NeedToUpdateOwner ? Owner : Info.Instance.Owner;
                         string UmoyaHome = Info.Instance.UmoyaHome;
                         string ZmodHome = Info.Instance.ZmodHome;
                         string nugetPath = Constants.ResourceDirecotryDefaultPath + Constants.PathSeperator + "nuget.config";
+                        Logger.Do("NeedToUpdate ProgressStatus " + NeedToUpdateProgressStatus);
                         if (!UpdateNugetConfig(nugetPath)) throw new Exceptions.ConfigurationNotFoundException(Constants.InfoCommandName);
-                        if (Console.SetInfoConfigurationValues(RepoSourceURL, Accesskey, ISDebugging, Owner) > 0) Console.LogLine("Configurations are updated successfully.");
+                        if (Console.SetInfoConfigurationValues(RepoSourceURL, Accesskey, Owner, Boolean.Parse(ISDebugging) , Boolean.Parse(ShowProgress)) > 0) Console.LogLine("Configurations are updated successfully.");
                         else throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.InfoCommandName, "Error When updating configurations");
                         Info.Instance.ReLoad();
                     }

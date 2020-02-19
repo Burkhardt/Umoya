@@ -17,11 +17,13 @@ namespace Repo.Clients.CLI.Commands.Tests
         #endregion
         public DeleteCommandTest()
         {
-           // Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
+            // Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             #region Check and start the repo server, if not already started.
-             if (!TestAPIs.IsRepoRunning())
+            if (!TestAPIs.IsRepoRunning())
             {
-                Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
+                //UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
+                TestAPIs.StartRepo();
             }
             #endregion
 
@@ -33,12 +35,12 @@ namespace Repo.Clients.CLI.Commands.Tests
 
         #region Umoya delete local resource which was added before.
         #endregion
-       // [Fact]
+        [Fact]
         public void ResourceDeletedInLocalTest()
         {
             #region Setup
             string TestScenariosName = "ResourceDeletedInLocalTest";
-            string ZMODPath = Constants.DefaultTestDataDir + Constants.PathSeperator + "temp" + 
+            string ZMODPath = Constants.DefaultTestDataDir + Constants.PathSeperator + "temp" +
             Constants.PathSeperator + Guid.NewGuid();
             Directory.CreateDirectory(ZMODPath);
             Assert.True(TestAPIs.InitZMOD(ZMODPath), "ZMOD init failed.");
@@ -70,6 +72,5 @@ namespace Repo.Clients.CLI.Commands.Tests
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
         }
-
     }
 }

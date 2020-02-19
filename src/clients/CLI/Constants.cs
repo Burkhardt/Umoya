@@ -60,5 +60,7 @@ namespace Repo.Clients.CLI
         public static readonly string DefaultNoVersionValue = "NoVersion";
 
         public static readonly string DefaultResourceCacheDirectory = ResourceDirecotryDefaultPath + Constants.PathSeperator + "cache";
+
+        public static readonly string DefaultResourceCacheCleanupToDoFile = Constants.DefaultResourceCacheDirectory + Constants.PathSeperator + "cleanup.txt";
     }
 }

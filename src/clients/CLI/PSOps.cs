@@ -11,6 +11,7 @@ namespace Repo.Clients.CLI
     public static class PSOps
     {
 
+        public static bool UserRequestToStop = false;
         public class PSOpsException : System.Exception {
             public PSOpsException(string message)
             : base(message)

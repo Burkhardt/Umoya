@@ -229,6 +229,7 @@ namespace Repo.Clients.CLI.Commands.Tests
                     Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
                     System.Console.WriteLine(dirPath.Replace(SourcePath, DestinationPath));
                 }
+
                 //Copy all the files & Replaces any files with the same name
                 foreach (string newPath in Directory.GetFiles(SourcePath, "*.*",
                     SearchOption.AllDirectories))
@@ -258,11 +259,24 @@ namespace Repo.Clients.CLI.Commands.Tests
                 System.Console.WriteLine(" Zip folder path: " + startPath + Constants.PathSeperator + zipPath);
                 if (File.Exists(startPath + Constants.PathSeperator + zipPath))
                 {
+                    // ZipFile.CreateFromDirectory(startPath, zipPath);
                     if (Directory.Exists(extractPath))
                     {
                         Directory.Delete(extractPath, true);
                     }
+
                     ZipFile.ExtractToDirectory(startPath + Constants.PathSeperator + zipPath, extractPath);
+
+                   /*  using (unzip)
+                    {
+                        System.Console.WriteLine("Listing files in the archive:");
+                        ListFiles(unzip);
+                        System.Console.WriteLine("Extracting files from the archive:");
+                        unzip.ExtractProgress += (s, e) => System.Console.WriteLine("{0} of {1}: {2}", e.CurrentFile, e.TotalFiles, e.FileName);
+                        unzip.ExtractToDirectory(extractPath);
+
+                        unzip.Dispose();
+                    }  */
                     System.Console.WriteLine("Extracted folder to " + extractPath);
                 }
             }
@@ -278,13 +292,20 @@ namespace Repo.Clients.CLI.Commands.Tests
         private static void ListFiles(Unzip unzip)
         {
             var tab = unzip.Entries.Any(e => e.IsDirectory) ? "\t" : string.Empty;
+
             foreach (var entry in unzip.Entries.OrderBy(e => e.Name))
             {
                 if (entry.IsFile)
                 {
+                    //System.Console.WriteLine(tab + "{0}: {1} -> {2}", entry.Name, entry.CompressedSize, entry.OriginalSize);
                     continue;
                 }
+
+                //System.Console.WriteLine(entry.Name);
             }
+
+            //System.Console.WriteLine();
         }
+
     }
 }

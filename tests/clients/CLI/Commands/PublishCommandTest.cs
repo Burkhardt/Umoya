@@ -15,6 +15,8 @@ namespace Repo.Clients.CLI.Commands.Tests
             #region Check and start the repo server, if not already started.
             if (!TestAPIs.IsRepoRunning())
             {
+                 //UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
                 Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
@@ -27,7 +29,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Baseline
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
-        //[Fact]
+        [Fact]
         public void ResourceWithoutDependency()
         {
             #region Setup
@@ -70,7 +72,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
         //3. HelloWorldData.csv should be present in local test-data folder
-        //[Fact]
+        [Fact]
         public void ResourceWithDependency()
         {
             #region Setup

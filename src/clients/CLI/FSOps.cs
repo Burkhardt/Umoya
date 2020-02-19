@@ -185,17 +185,13 @@ namespace Repo.Clients.CLI
             }
         }
 
-      public static bool UpdateInfoValue(string RepoSourceURL, string Accesskey, string ISDebugging, string Owner)
+      public static bool UpdateInfoValue(string RepoSourceURL, string Accesskey, string Owner, bool IsDebugging , bool ShowProgess)
         {
             try
-            {
-                dynamic jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Constants.ConfigFileName));
-                jsonObject.Owner = Owner;
-                 jsonObject.Source.Accesskey = Accesskey;
-                  jsonObject.Source.Url = RepoSourceURL;
-                  jsonObject.ISDebugging = ISDebugging;
-                var modifiedJsonString = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject);
-                File.WriteAllText(Constants.ConfigFileName, modifiedJsonString);
+            {                
+                Info info = new Info(Info.Instance.UmoyaHome, Info.Instance.ZmodHome, Owner, RepoSourceURL , Accesskey, IsDebugging, ShowProgess);
+                string JSONresult = JsonConvert.SerializeObject(info);
+                File.WriteAllText(Constants.ConfigFileName, JSONresult);
                 return true;
             }
             catch (Exception ex)
