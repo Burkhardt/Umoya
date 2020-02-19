@@ -29,7 +29,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Baseline
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
-        [Fact]
+        //[Fact]
         public void ResourceWithoutDependency()
         {
             #region Setup
@@ -72,7 +72,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
         //3. HelloWorldData.csv should be present in local test-data folder
-        [Fact]
+        //[Fact]
         public void ResourceWithDependency()
         {
             #region Setup
