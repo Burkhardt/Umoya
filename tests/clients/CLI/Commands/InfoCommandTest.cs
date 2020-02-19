@@ -37,7 +37,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         // 2. Capture the Expected Output
         #endregion
 
-        //[Fact]
+        [Fact]
         public void WithDefaultConfigurationsPresentInfoTest()
         {
             #region Setup
@@ -75,7 +75,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff),
             "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-
+TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
