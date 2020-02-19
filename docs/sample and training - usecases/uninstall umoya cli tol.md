@@ -1,4 +1,4 @@
-## UseCase
+## Use Case
 You installed UMOYA CLI on your system and now You want to uninstall.
 
 ## Step
