@@ -1,9 +1,12 @@
-## Usecase(s)
+## Use Case 
+You have resource(s) Model, Code and Data and You want to delete resource from your local resource directory (ZMOD) with dependencies.
 
-1. Install Umoya CLI Tool and configure once
-2. Publish resource(s)
-3. Add resource(s) from Repo to local resource directory (ZMOD)
-4. Delete resource(s) from local resource directory (ZMOD)
-5. Query Resource(s) of local resource directory(ZMOD) or Repo server.
-6. Upgrade Umoya CLI Tool
-7. UnInstall Umoya
+### Steps
+* Go to your local resource directory in command line.
+* Type below command to delete <br/>
+  umoya delete ResouceName@Version<br/>
+  umoya delete ResourceName</br>
+  For example, <br/>
+  umoya delete C:\temp\HelloWorldData.csv@1.0.0<br/>
+  umoya delete c:\temp\HelloWorld.csv
+* To verify your resource is deleted, You can query resource locally.
