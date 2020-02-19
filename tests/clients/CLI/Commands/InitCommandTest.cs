@@ -70,7 +70,7 @@ TestAPIs.StopRepo();
         //Check for the Directory Exists 
         //Capture and compare output ->
         #region Umoya already present or initialized
-        //[Fact]
+        [Fact]
         public void WithTempFolderExistingTest()
         {
             #region Setup
@@ -99,7 +99,7 @@ TestAPIs.StopRepo();
             string OutputDiff = string.Empty;
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-
+TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
