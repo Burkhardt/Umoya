@@ -28,7 +28,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorld.pmml@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-       // [Fact]
+        [Fact]
         #endregion
         public void ResourceModelPresentInRepoTest()
         {
@@ -52,6 +52,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             string ResourceExpectedPath = ZMODPath + Constants.PathSeperator + Constants.ModelDirName + Constants.PathSeperator + ResourceToAdd;
             Assert.True(File.Exists(ResourceExpectedPath), "Model Resource is not found in ZMOD after the  ADD command is run.");
             #endregion
+            TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
@@ -63,7 +64,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldCode.ipynb@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-       //[Fact]
+       [Fact]
         #endregion
         public void ResourceCodePresentInRepoTest()
         {
@@ -81,6 +82,8 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             string ResourceExpectedPath = ZMODPath + Constants.PathSeperator + Constants.CodeDirName + Constants.PathSeperator + ResourceToAdd + Constants.PathSeperator + ResourceToAdd;
             Assert.True(File.Exists(ResourceExpectedPath), "Code Resource is not found in ZMOD after the  ADD command is run.");
+            TestAPIs.StopRepo();
+
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
@@ -91,7 +94,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Resource HelloWorldData.csv@1.0.0 is present in Repo
         //2. User has initialized ZMOD.
         //3. Captured expected output.       
-        //[Fact]
+        [Fact]
         #endregion
         public void ResourceDataPresentInRepoTest()
         {
@@ -109,6 +112,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             string ResourceExpectedPath = ZMODPath + Constants.PathSeperator + Constants.DataDirName + Constants.PathSeperator + ResourceToAdd;
             Assert.True(File.Exists(ResourceExpectedPath), "Data Resource is not found in ZMOD after the  ADD command is run.");
+           TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
