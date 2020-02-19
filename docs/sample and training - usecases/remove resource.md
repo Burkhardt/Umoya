@@ -1,6 +1,6 @@
 ## Use Case 
 If your UMOYA Tool does not perform as well then you can always raise support ticket or contact us for more help.<br/>
-You installed UMOYA CLI Tool and now you want to uninstall from your system.
+If You still want to uninstall from your system then please follow below step.
 
 ### Steps
 * Go to command line or terminal and perform below command.
