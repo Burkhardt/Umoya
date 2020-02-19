@@ -1,4 +1,4 @@
-## Usecase(s)
+## Use Case
 You have UMOYA CLI tool installed, now You want to configure to your local resource directory (ZMOD).
 
 ### Steps
