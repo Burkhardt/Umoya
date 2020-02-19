@@ -1,1 +1,1 @@
-## Help Documents Index
+## Help Document Index
