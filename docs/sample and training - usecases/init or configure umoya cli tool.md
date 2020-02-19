@@ -1,9 +1,9 @@
 ## Usecase(s)
+You have UMOYA CLI tool installed, now You want to configure to your local resource directory (ZMOD).
 
-1. Install Umoya CLI Tool and configure once
-2. Publish resource(s)
-3. Add resource(s) from Repo to local resource directory (ZMOD)
-4. Delete resource(s) from local resource directory (ZMOD)
-5. Query Resource(s) of local resource directory(ZMOD) or Repo server.
-6. Upgrade Umoya CLI Tool
-7. UnInstall Umoya
+### Steps
+1. Decide where do you want to store ai project resource(s) like Model, Code and Data.
+2. Go to command line and initialize your resource directory (Note : This is one time action)
+   umoy init
+3. Once initialized, You can associate your interested repo. To do so, You need to configure your local directory.
+   umoya info --repo-url https://hub.mlw.ai/v3/index.json
