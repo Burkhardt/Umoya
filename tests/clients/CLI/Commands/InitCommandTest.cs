@@ -1,22 +1,31 @@
-
-
 using System;
 using Xunit;
 using System.IO;
+using Xunit.Extensions.Ordering;
+using Xunit.Abstractions;
+//Optional
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+//Optional
+[assembly: TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
+//Optional
+[assembly: TestCollectionOrderer("Xunit.Extensions.Ordering.CollectionOrderer", "Xunit.Extensions.Ordering")]
 
 namespace Repo.Clients.CLI.Commands.Tests
 {
     public class InitCommandTest
     {
         public static string TestName = "InitCommand";
-
-        public InitCommandTest()
+        private readonly ITestOutputHelper output;
+        public InitCommandTest(ITestOutputHelper output)
         {
+            this.output = output;
             //TestAPIs.StopRepo();
-             #region Check and start the repo server, if not already started.
+            #region Check and start the repo server, if not already started.
             if (!TestAPIs.IsRepoRunning())
             {
-                Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
+                //UnZip publish folder in umoya repo bin folder
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
+                TestAPIs.StartRepo();
             }
             #endregion
             //If not then need to start repo.
@@ -31,9 +40,12 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Zmod is not configured..
         //capture the output to run the command  umoya init 
         // To initialize ZMOD here, Use command : umoya init
-        [Fact]
+
+       // [Fact, Order(1)]
+        //[Trait("Category", "Init")]
         public void WithBlankFolderTest()
         {
+            output.WriteLine("WithBlankFolderTest");
             #region SetUp
             string TestScenariosName = "WithBlankFolderTest";
             string ZMODPath = Constants.DefaultTestDataDir + Constants.PathSeperator + "temp" + Constants.PathSeperator + Guid.NewGuid();
@@ -61,6 +73,7 @@ namespace Repo.Clients.CLI.Commands.Tests
 TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
+            //TestAPIs.StopRepo();
             #endregion
         }
         #endregion
@@ -69,9 +82,11 @@ TestAPIs.StopRepo();
         //Check for the Directory Exists 
         //Capture and compare output ->
         #region Umoya already present or initialized
-       // [Fact]
+        //[Fact, Order(2)]
+       // [Trait("Category", "Init")]
         public void WithTempFolderExistingTest()
         {
+            output.WriteLine("WithTempFolderExistingTest");
             #region Setup
             string TestScenariosName = "WithTempFolderExistingTest";
             //Need to do Umoya Repo Baseline setup
@@ -101,7 +116,6 @@ TestAPIs.StopRepo();
 
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
-            TestAPIs.StopRepo();
             #endregion
         }
         #endregion
