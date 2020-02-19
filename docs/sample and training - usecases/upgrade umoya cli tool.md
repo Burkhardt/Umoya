@@ -1,9 +1,9 @@
-## Usecase(s)
+## Use Case
+You have UMOYA CLI Tool in your system with version x.x.x. and now you want to upgrade your tool with latest version.
 
-1. Install Umoya CLI Tool and configure once
-2. Publish resource(s)
-3. Add resource(s) from Repo to local resource directory (ZMOD)
-4. Delete resource(s) from local resource directory (ZMOD)
-5. Query Resource(s) of local resource directory(ZMOD) or Repo server.
-6. Upgrade Umoya CLI Tool
-7. UnInstall Umoya
+### Step
+* Go to command line console or terminal and perform below command. <br/>
+  dotnet tool update  -g umoya --add-source https://hub.umoya.ai/v3/index.json
+* Type below command anc check that You have latest version
+  umoya
+  
