@@ -1,5 +1,4 @@
-## Use Case : 
-
+## Use Case
 Repo (https://hub.mlw.ai﻿) has Model (HelloWorld.pmml),  You want to add into your local ZMOD drive.
 
 ### Steps
