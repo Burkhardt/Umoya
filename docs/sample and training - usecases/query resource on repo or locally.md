@@ -3,7 +3,7 @@ To view list of resource(s) from repo or local resource directory (ZMOD) or You 
 
 Note : 
 Ensure you have umoya cli tool installed. You can just type 'umoya' in commanline and check version 2.4.2 is installed or not.
-If you do not have then please follow this page : Install Umoya CLI Tool and configure once.
+If you do not have then please follow this page : [Installation](https://github.com/Umoya-ai/UMOYA/blob/master/docs/sample%20and%20training%20-%20usecases/install%20umoya%20cli%20tool.md) and [Configuration](https://github.com/Umoya-ai/UMOYA/blob/master/docs/sample%20and%20training%20-%20usecases/init%20or%20configure%20umoya%20cli%20tool.md) 
 
 ### Steps
 * To get the list of your resource from local ZMOD directory or Repo server, use the below command:</br>
