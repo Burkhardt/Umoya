@@ -6,7 +6,7 @@ Ensure you have umoya cli tool installed. You can just type 'umoya' in commanlin
 If you do not have then please follow this page : [Installation](https://github.com/Umoya-ai/UMOYA/blob/master/docs/sample%20and%20training%20-%20usecases/install%20umoya%20cli%20tool.md) and [Configuration](https://github.com/Umoya-ai/UMOYA/blob/master/docs/sample%20and%20training%20-%20usecases/init%20or%20configure%20umoya%20cli%20tool.md) 
 
 ### Steps
-* To get the list of your resource from local ZMOD directory or Repo server, use the below command:</br>
+* To get the list of your resource from local resource directory (ZMOD) or Repo server, use the below command:</br>
   umoya list</br>
   umoya list –from repo
 
@@ -17,10 +17,10 @@ If you do not have then please follow this page : [Installation](https://github.
 * To get list from Repo server based on Type/Class(Model, Code, Data) use below command</br>
   umoya list –from repo –class Model
 
-* To save all from ZMOD local directory or Repo Server into some output file, use the below command</br>
+* To save all details from local resource directory (ZMOD) or Repo Server into some output file, use the below command</br>
   umoya list –file MyLocalData.json</br>
   umoya list –from repo –file MyServerData.json
 
-* You can filter the list for our ZMOD drive or Repo server by using the below command</br>
+* You can filter the list for your local resource directory (ZMOD) or Repo server by using the below command</br>
   umoya list –from repo –query "some query string"</br>
   umoya list –query "some query string"
