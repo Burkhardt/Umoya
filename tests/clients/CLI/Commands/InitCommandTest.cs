@@ -16,7 +16,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             {
                 //UnZip publish folder in umoya repo bin folder
                 Assert.True(TestAPIs.UnZipPublishFolder(),"Failed to exract publish folder to get binary file.");
-                TestAPIs.StartRepo();
+                Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
             //If not then need to start repo.
