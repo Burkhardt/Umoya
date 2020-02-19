@@ -70,7 +70,7 @@ TestAPIs.StopRepo();
         //Check for the Directory Exists 
         //Capture and compare output ->
         #region Umoya already present or initialized
-        [Fact]
+      //  [Fact]
         public void WithTempFolderExistingTest()
         {
             #region Setup
