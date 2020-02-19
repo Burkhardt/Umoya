@@ -1,4 +1,4 @@
-## sample and training - usecases
+## Sample and Training
 
 ### Usecase(s) for CLI
 
