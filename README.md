@@ -7,7 +7,7 @@ The spirit of Machine Learning and Deep Learning.
 Versioning resource(like model, data and code) and manage its dependencies for ai projects.
 
 <p align="center">
-  <img width="100%" src="https://github.com/nimeshgit/repo/blob/master/docs/media/icons/UmoyaUI.PNG">
+  <img width="100%" src="https://github.com/Umoya-ai/UMOYA/blob/master/docs/media/icons/UmoyaUI.PNG">
 </p>
 
 ## Getting Started
