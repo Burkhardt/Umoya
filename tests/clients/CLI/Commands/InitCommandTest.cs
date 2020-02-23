@@ -15,7 +15,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             if (!TestAPIs.IsRepoRunning())
             {
                 //UnZip publish folder in umoya repo bin folder
-                Assert.True(TestAPIs.UnZipPublishFolder(),"Failed to exract publish folder to get binary file.");
+                Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
                 Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
             }
             #endregion
@@ -58,10 +58,9 @@ namespace Repo.Clients.CLI.Commands.Tests
             string OutputDiff = string.Empty;
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-TestAPIs.StopRepo();
+            TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
-            //TestAPIs.StopRepo();
             #endregion
         }
         #endregion
@@ -70,7 +69,7 @@ TestAPIs.StopRepo();
         //Check for the Directory Exists 
         //Capture and compare output ->
         #region Umoya already present or initialized
-      //  [Fact]
+        //  [Fact]
         public void WithTempFolderExistingTest()
         {
             #region Setup
@@ -99,7 +98,7 @@ TestAPIs.StopRepo();
             string OutputDiff = string.Empty;
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-TestAPIs.StopRepo();
+            TestAPIs.StopRepo();
             #region Clean up
             FSOps.DeleteDirectory(ZMODPath);
             #endregion
