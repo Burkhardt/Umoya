@@ -47,20 +47,20 @@ namespace Repo.Clients.CLI.Commands.Tests
 
             string ExpectedContents = string.Empty;
             string ActualContents = string.Empty;
-            
+
             string ExpectedOutputFilePath = Constants.DefaultTestDataDir + Constants.PathSeperator + "expected-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt";
-            ExpectedContents = string.Join( ",", File.ReadAllLines(ExpectedOutputFilePath).ToList())
-            .Replace('\n', ' ').Replace('\t', ' ').Replace('\r', ' ').Replace("  ", string.Empty).Replace("   ", string.Empty)
-            .Replace(" ", string.Empty);
-            
-            string ActualOutputFilePath = Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt";
-             ActualContents = string.Join( ",", File.ReadAllLines(ActualOutputFilePath).ToList())
+            ExpectedContents = string.Join(",", File.ReadAllLines(ExpectedOutputFilePath).ToList())
             .Replace('\n', ' ').Replace('\t', ' ').Replace('\r', ' ').Replace("  ", string.Empty).Replace("   ", string.Empty)
             .Replace(" ", string.Empty);
 
-            var DifferenceBetweenExpectedAndActualOutput = string.Compare(ActualContents,ExpectedContents);
+            string ActualOutputFilePath = Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt";
+            ActualContents = string.Join(",", File.ReadAllLines(ActualOutputFilePath).ToList())
+           .Replace('\n', ' ').Replace('\t', ' ').Replace('\r', ' ').Replace("  ", string.Empty).Replace("   ", string.Empty)
+           .Replace(" ", string.Empty);
+
+            var DifferenceBetweenExpectedAndActualOutput = string.Compare(ActualContents, ExpectedContents);
             System.Console.WriteLine("ActualContents " + ActualContents);
-            System.Console.WriteLine("ExpectedContents "+ ExpectedContents);
+            System.Console.WriteLine("ExpectedContents " + ExpectedContents);
             if (DifferenceBetweenExpectedAndActualOutput > 0)
             {
                 Status = false;
@@ -112,7 +112,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             bool Status = true;
             CaptureConsoleOutPut("init", string.Empty, ZMODPath, string.Empty);
-            CaptureConsoleOutPut("info", "-sp False", ZMODPath, string.Empty);
+            CaptureConsoleOutPut("info", "-d False", ZMODPath, string.Empty);
             return Status;
         }
 
@@ -189,7 +189,7 @@ namespace Repo.Clients.CLI.Commands.Tests
                 }
                 else
                 {
-                    System.Console.WriteLine("UmoyaBinaryFile " + RepoPath + Constants.PathSeperator + UmoyaBinaryFileName + " not found.");
+                    System.Console.WriteLine("UmoyaBinaryFile " + RepoPath + Constants.PathSeperator + "publish" + Constants.PathSeperator + UmoyaBinaryFileName + "  not found.");
                     Status = false;
                 }
             }
@@ -204,7 +204,11 @@ namespace Repo.Clients.CLI.Commands.Tests
         public static bool StopRepo()
         {
             if (IsRepoRunning())
-                RepoProcess.Kill();
+            {
+                var prc = new ProcManager();
+                prc.KillByPort(8007);
+            }
+            //RepoProcess.Kill();
             //Check Repo is running then do stop
             return true;
         }
@@ -266,17 +270,6 @@ namespace Repo.Clients.CLI.Commands.Tests
                     }
 
                     ZipFile.ExtractToDirectory(startPath + Constants.PathSeperator + zipPath, extractPath);
-
-                   /*  using (unzip)
-                    {
-                        System.Console.WriteLine("Listing files in the archive:");
-                        ListFiles(unzip);
-                        System.Console.WriteLine("Extracting files from the archive:");
-                        unzip.ExtractProgress += (s, e) => System.Console.WriteLine("{0} of {1}: {2}", e.CurrentFile, e.TotalFiles, e.FileName);
-                        unzip.ExtractToDirectory(extractPath);
-
-                        unzip.Dispose();
-                    }  */
                     System.Console.WriteLine("Extracted folder to " + extractPath);
                 }
             }
