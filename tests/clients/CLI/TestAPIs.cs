@@ -112,7 +112,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             bool Status = true;
             CaptureConsoleOutPut("init", string.Empty, ZMODPath, string.Empty);
-            CaptureConsoleOutPut("info", "-d False", ZMODPath, string.Empty);
+            CaptureConsoleOutPut("info", "-sp False", ZMODPath, string.Empty);
             return Status;
         }
 
