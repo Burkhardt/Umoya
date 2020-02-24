@@ -31,7 +31,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Zmod is not configured..
         //capture the output to run the command  umoya init 
         // To initialize ZMOD here, Use command : umoya init
-        [Fact]
+       // [Fact]
         public void WithBlankFolderTest()
         {
             #region SetUp

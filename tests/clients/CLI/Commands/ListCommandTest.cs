@@ -35,7 +35,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //2. User has initialized ZMOD.    Folders are created in ZMODHome/Models , Code  Data 
         //3. Captured expected output.      
         #endregion
-        //[Fact]
+        [Fact]
         public void LocalListWithBaselineResourcesTest()
         {
             string TestScenariosName = "LocalListWithBaselineResourcesTest";
