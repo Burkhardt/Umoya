@@ -19,7 +19,7 @@ namespace Repo.Clients.CLI.Commands
     {
 
         [Required]
-        [Argument(0, "CompressRepoFilePath", Description = "Give Compress file path (.zip)")]
+        [Argument(0, "FilePath", Description = "Give file path (.zip) of compressed repository.")]
         public string CompressRepoFilePath { get; set; }
 
         private async Task OnExecuteAsync()

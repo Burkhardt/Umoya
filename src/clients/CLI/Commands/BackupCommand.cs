@@ -19,13 +19,14 @@ namespace Repo.Clients.CLI.Commands
     {
 
         [Required]
-        [Argument(0, "BackupFilePath", Description = "Give Backup file path (.zip)")]
+        [Argument(0, "FilePath", Description = "Give Backup file path (.zip)")]
         public string BackupFilePath { get; set; }
 
         private async Task OnExecuteAsync()
         {
             try
             {
+
                 Console.PrintActionPerformSuccessfully(Constants.BackupCommandName); 
             }
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }

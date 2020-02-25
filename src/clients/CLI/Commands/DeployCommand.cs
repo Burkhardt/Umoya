@@ -19,18 +19,18 @@ namespace Repo.Clients.CLI.Commands
     {
 
         [Required]
-        [Argument(0, "CompressRepoFilePath", Description = "Give file path (.zip) ")]
+        [Argument(0, "FilePath", Description = "Give file path (.zip) of the compressed repository.")]
         public string CompressRepoFilePath { get; set; }
 
         [Required]
-        [Argument(1, "FolderPathToDeploy", Description = "Give folder path to deploy repository.")]
+        [Argument(1, "FolderPath", Description = "Give folder path where you want to deploy repository.")]
         public string FolderPathToDeploy { get; set; }
 
         private async Task OnExecuteAsync()
         {
             try
             {
-                Console.PrintActionPerformSuccessfully(Constants.BackupCommandName); 
+                Console.PrintActionPerformSuccessfully(Constants.DeployCommandName); 
             }
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
             catch (Exceptions.ResourceInfoInvalidFormatException etr) { Logger.Do(etr.Message); }
