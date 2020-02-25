@@ -47,7 +47,8 @@ namespace Umoya.Core.Search
                 var versionResults = versions.Select(p => new SearchResultVersion(
                     registrationLeafUrl: _url.GetRegistrationLeafUrl(p.Id, p.Version),
                     p.Version,
-                    p.Downloads));
+                    p.Downloads,
+                    p.Published));
 
                 result.Add(new SearchResult(
                     latest.Id,

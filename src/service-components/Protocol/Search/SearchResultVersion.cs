@@ -11,7 +11,8 @@ namespace Umoya.Protocol
     /// Documentation: https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource#search-result
     /// </summary>
     public class SearchResultVersion
-    {
+    {        
+
         public SearchResultVersion(
             string registrationLeafUrl,
             NuGetVersion version,
@@ -24,6 +25,14 @@ namespace Umoya.Protocol
             Downloads = downloads;
         }
 
+        public SearchResultVersion(string registrationLeafUrl, NuGetVersion version, long downloads, DateTime published)
+        {
+            RegistrationLeafUrl = registrationLeafUrl;
+            Version = version;
+            Downloads = downloads;
+            Published = published;
+        }
+
         [JsonProperty(PropertyName = "@id")]
         public string RegistrationLeafUrl { get; }
 
@@ -31,5 +40,8 @@ namespace Umoya.Protocol
         public NuGetVersion Version { get; }
 
         public long Downloads { get; }
+
+        public DateTime Published { get; }
+
     }
 }
