@@ -8,11 +8,9 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Umoya/bin/Debug/netcoreapp2.2/Umoya.dll",
+            "program": "${workspaceFolder}/src/service-components/Umoya/bin/Debug/netcoreapp2.2/Umoya.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/Umoya",
+            "cwd": "${workspaceFolder}/src/service-components/Umoya",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
