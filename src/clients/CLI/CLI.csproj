@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://github.com/nimeshgit/repo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/nimeshgit/repo</RepositoryUrl>
     <PackageTags>umoya</PackageTags>
-    <Version>1.4.0</Version>
+    <Version>2.5.0</Version>
     <ToolCommandName>umoya</ToolCommandName>
     <Authors>Nimesh</Authors>
     <Company>Software AG</Company>
