@@ -34,6 +34,9 @@ namespace Repo.Clients.CLI.Commands
         [Argument(0, "ResourceInfo", Description = "Give Resource name@version to add i.e. HelloWorld.pmml@1.0.0. Default version is latest, If not given.")]
         public string ResourceInfo { get; set; }
 
+        [Option("-ol|--offline", "Set True If You want to add resource from cache only as off-line (default is false) --from-cache true", CommandOptionType.SingleValue)]
+        public bool CacheStrategy { get; set; } = Constants.DefaultCacheStrategy;
+
         public string ResourceName { get; set; }
         public string ResourceType { get; set; }
 
@@ -98,39 +101,45 @@ namespace Repo.Clients.CLI.Commands
                     // Need to resolve when version is not passed
                     #region to check given resource and version is present.
                     Console.WriteLine("> Checking resource in Repo.", System.Console.ForegroundColor);
-                    if (!await Resources.IsResourcePresentInRepoAsync(ResourceId)) throw new Exceptions.ResourceNotFoundInRepoException(Constants.AddCommandName);
+                    if (!await Resources.IsResourcePresentInRepoAsync(ResourceId, CacheStrategy)) throw new Exceptions.ResourceNotFoundInRepoException(Constants.AddCommandName);
                     #endregion
                     #region Clear Temp Cache
                     List<string> ErrorInfo = new List<string>();
                     List<string> OutputInfo = new List<string>();
                     string ClearCacheCommandString = "nuget locals temp -c";
                     Logger.Do("Clearning Temp Cache for Nuget " + ClearCacheCommandString);
-                    ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo);
+                    ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo, Constants.ResourceDirecotryDefaultPath);
                     ClearCacheCommandString = "nuget locals http-cache -c";
                     Resources.DoCacheCleanUpIfNeeded();
                     Logger.Do("Clearning Temp Cache for Nuget " + ClearCacheCommandString);
-                    ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo);
+                    ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo, Constants.ResourceDirecotryDefaultPath);
                     #endregion
                     #region Nuget add command
-                    Console.WriteLine("> Started downloading resource from Repo.", System.Console.ForegroundColor);
                     string AddCommandString = Constants.AddCommandName + " " + Constants.ResourceProjectDefaultPath + " package " + ResourceName;
                     bool HasResourceVersion = IsResourceVersionGiven(ResourceVersion);
                     if (HasResourceVersion) AddCommandString = AddCommandString + " --version " + ResourceVersion;
                     Logger.Do("Get resource info from repo");
-                    if(!HasResourceVersion) 
+                    if(CacheStrategy)
                     {
-                        Logger.Do("Got latest version " + ResourceVersion);
-                        ResourceId = await Resources.GetLatestResourceInfoByNameFromRepo(ResourceName);
+                        Console.WriteLine("> Started using resource from cache.", System.Console.ForegroundColor);
                     }
                     else
-                        ResourceId = await Resources.GetResourceInfoByNameAndVersionFromRepo(ResourceName, ResourceVersion);
-                    Resources.DownloadResourcesInCache(ResourceId, Constants.DefaultResourceCacheDirectory);
+                    {
+                        Console.WriteLine("> Started downloading resource from Repo.", System.Console.ForegroundColor);
+                        if(!HasResourceVersion) 
+                        {
+                            Logger.Do("Got latest version " + ResourceVersion);
+                            ResourceId = await Resources.GetLatestResourceInfoByNameFromRepo(ResourceName);
+                        }
+                        else ResourceId = await Resources.GetResourceInfoByNameAndVersionFromRepo(ResourceName, ResourceVersion);
+                        Resources.DownloadResourcesInCache(ResourceId, Constants.DefaultResourceCacheDirectory);
+                    }
                     Logger.Do("Add nuget command string " + AddCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, AddCommandString, out OutputInfo);
                     if (ErrorInfo.Count > 0) throw new Exceptions.ActionNotSuccessfullyPerformException(Name, string.Join('\n', ErrorInfo));
                     else Console.WriteLine("> Resource is downloaded.", System.Console.ForegroundColor);
                     #endregion
-
+                    
                     #region Resolving ZMOD Dir
                     if(!ResourceId.HasVersion()) ResourceId.Version = Resources.GetResourceVersionFromProject(ResourceId.ResourceName);
                     if(ResourceId.HasVersion())
@@ -145,8 +154,12 @@ namespace Repo.Clients.CLI.Commands
                     }                  
                     Console.WriteLine("> Resource (and its dependencies) are resolved and added into ZMOD.", System.Console.ForegroundColor);
                     #endregion
-                    #region Clean up local cache                    
-                    FSOps.CleanUpCacheByResource(ResourceId.ResourceName, ResourceId.Version);
+                    #region Clean up local resource cache  
+                    foreach(ResourceIdentifier RId in ListOfInterestedResourcesToProcess)
+                    {
+                        Logger.Do("Clearning cache for resource " + RId.ToString());
+                        FSOps.CleanUpCacheByResource(RId.ResourceName, RId.Version);
+                    }                    
                     Console.WriteLine("> Cleared resource cache.", System.Console.ForegroundColor);
                     #endregion
                 }

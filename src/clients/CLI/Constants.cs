@@ -3,7 +3,7 @@ using System;
 namespace Repo.Clients.CLI
 {
     public static class Constants
-    {        
+    {
         public const string UmoyaHomeName = ".umoya";
         public static readonly char PathSeperator = System.IO.Path.DirectorySeparatorChar;
         public static readonly string OwnerAsCurrentUser = Environment.UserName;
@@ -36,7 +36,7 @@ namespace Repo.Clients.CLI
         public static string TempDirecotryDefaultPath = UmoyaHomeName + PathSeperator + "temp";
 
         public const string AuthorDefault = "Rainer";
-        
+
         public static readonly string CodeDirName = "Code";
         public static readonly string DataDirName = "Data";
         public static readonly string ModelDirName = "Models";
@@ -62,5 +62,15 @@ namespace Repo.Clients.CLI
         public static readonly string DefaultResourceCacheDirectory = ResourceDirecotryDefaultPath + Constants.PathSeperator + "cache";
 
         public static readonly string DefaultResourceCacheCleanupToDoFile = Constants.DefaultResourceCacheDirectory + Constants.PathSeperator + "cleanup.txt";
+
+        public const bool DefaultCacheStrategy = false;
+
+        public const string BackupCommandName = "backup";
+        public const string BackupCommandDescription = "Take backup of resource(s) into .zip file.";
+        public const string CompressCommandName = "compress";
+        public const string CompressCommandDescription = "Compress resource(s) and its depenent resource(s) into .zip file.";
+
+        public const string DeployCommandName = "deploy";
+        public const string DeployCommandDescription = "Deploy repository and its dependent resource(s) to given repository folder.";
     }
 }

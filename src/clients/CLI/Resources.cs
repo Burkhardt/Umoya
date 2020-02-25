@@ -297,13 +297,23 @@ namespace Repo.Clients.CLI
             return ListOfDependencies;
         }
 
-        public static async Task<bool> IsResourcePresentInRepoAsync(ResourceIdentifier ResourceId)
+        public static async Task<bool> IsResourcePresentInRepoAsync(ResourceIdentifier ResourceId, bool CacheStrategy=false)
         {
             string RequestedUrl = string.Empty;
-            if (ResourceId.HasVersion()) RequestedUrl = GetEndPointForResourceVersionIndex(ResourceId.ResourceName, ResourceId.Version);
-            else RequestedUrl = GetEndPointForResourceIndex(ResourceId);
-            Logger.Do("IsResourcePresentInRepoAsync with URL " + RequestedUrl);
-            return await RestOps.IsEndPointPresentAsync(RequestedUrl);
+            bool Status = false;
+            if(CacheStrategy)
+            {
+                //Need to check resource and its dependent resource(s) are present in cache
+                return true;
+            }
+            else
+            {
+                if (ResourceId.HasVersion()) RequestedUrl = GetEndPointForResourceVersionIndex(ResourceId.ResourceName, ResourceId.Version);
+                else RequestedUrl = GetEndPointForResourceIndex(ResourceId);
+                Logger.Do("IsResourcePresentInRepoAsync with URL " + RequestedUrl);
+                Status = await RestOps.IsEndPointPresentAsync(RequestedUrl);
+            }
+            return Status;
         }
 
         public static string GetEndPointForResourceIndex(ResourceIdentifier ResourceId)

@@ -44,8 +44,11 @@ namespace Repo.Clients.CLI
             else if (CommandName.Equals("add")) return await CommandLineApplication.ExecuteAsync<AddCommand>(newArgs);
             else if (CommandName.Equals("init")) return await CommandLineApplication.ExecuteAsync<InitCommand>(newArgs);
             else if (CommandName.Equals("delete")) return await CommandLineApplication.ExecuteAsync<DeleteCommand>(newArgs);
-            else if (CommandName.Equals("list")) return await CommandLineApplication.ExecuteAsync<ListCommand>(newArgs);
+            else if (CommandName.Equals("list") || CommandName.Equals("ls")) return await CommandLineApplication.ExecuteAsync<ListCommand>(newArgs);
             else if (CommandName.Equals("info")) return await CommandLineApplication.ExecuteAsync<InfoCommand>(newArgs);
+            else if (CommandName.Equals("backup")) return await CommandLineApplication.ExecuteAsync<BackupCommand>(newArgs);
+            else if (CommandName.Equals("compress")) return await CommandLineApplication.ExecuteAsync<CompressCommand>(newArgs);
+            else if (CommandName.Equals("deploy")) return await CommandLineApplication.ExecuteAsync<DeployCommand>(newArgs);
             else if (CommandName.Equals("-v") || CommandName.Equals("--version") || CommandName.Equals("version")) return Console.ShowVersion();
             else return Console.PrintListOfActions();
         }

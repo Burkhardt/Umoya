@@ -22,7 +22,10 @@ namespace Repo.Clients.CLI
             { Constants.AddCommandName, Constants.AddCommandDescription},
             { Constants.DeleteCommandName, Constants.DeleteCommandDescription},
             { Constants.PublishCommandName, Constants.PublishCommandDescription},
-            { Constants.UpgradeCommandName, Constants.UpgradeCommandDescription},
+            /*{ Constants.UpgradeCommandName, Constants.UpgradeCommandDescription},*/
+            { Constants.BackupCommandName, Constants.BackupCommandDescription},
+            { Constants.CompressCommandName, Constants.CompressCommandDescription},
+            { Constants.DeployCommandName, Constants.DeployCommandDescription},
         };
         public static bool IsZMODConfigured()
         {
