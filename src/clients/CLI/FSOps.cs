@@ -262,7 +262,7 @@ namespace Repo.Clients.CLI
         {
             try
             {     
-                /*Debugging     
+                /*Debugging*/     
                 //resources\resources\helloworld.pmml\1.0.0
                 string ResourceCacheDir = Constants.ResourceDirecotryDefaultPath + Constants.PathSeperator + "resources" + Constants.PathSeperator + ResourceName.ToLower() + Constants.PathSeperator + ResourceVersion;
                 string ResourceCacheContentFileDir = ResourceCacheDir + Constants.PathSeperator + "contentFiles";
@@ -273,7 +273,6 @@ namespace Repo.Clients.CLI
                 string ResourceCachePackageFile = ResourceCacheDir + Constants.PathSeperator + ResourceName.ToLower() + "." + ResourceVersion + ".nupkg";
                 Logger.Do("Deleting " + ResourceCachePackageFile);
                 File.Delete(ResourceCachePackageFile);
-                */
             }
             catch(Exception ex)
             {

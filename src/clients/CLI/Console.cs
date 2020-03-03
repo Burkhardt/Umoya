@@ -8,7 +8,9 @@ namespace Repo.Clients.CLI
 {
     public class Console
     {
-
+        private static bool IsJSONOutput = false;
+        private static bool IsListAction = false;
+        private static string[] ActionInput = new string[]{};
         private static System.ConsoleColor WarningColor = System.ConsoleColor.Yellow;
         private static System.ConsoleColor ErrorColor = System.ConsoleColor.Red;
         private static System.ConsoleColor TableHeaderColor = System.ConsoleColor.Yellow;
@@ -79,6 +81,7 @@ namespace Repo.Clients.CLI
         }
         public static void WriteLine(string str, System.ConsoleColor InterestedColor)
         {
+            //
             int returnCount = str.Count(ch => ch == '\n');
             System.Console.ResetColor();
             System.ConsoleColor currentColor = System.Console.ForegroundColor;
@@ -104,12 +107,33 @@ namespace Repo.Clients.CLI
 
         public static void LogError(string LogMessage)
         {
+            //If with json or not
             WriteLine(LogMessage, ErrorColor);
         }
 
         public static void LogWarning(string LogMessage)
         {
             WriteLine(LogMessage, WarningColor);
+        }
+
+        public static void Init(string[] args)
+        {
+            //Find action and set IsListAction = true
+            //Find JSON output option and if found then set IsJSONOutput = true;
+            //
+        }
+
+        public static void Close()
+        {
+            if(IsJSONOutput) OutputJson();
+        }
+
+        public static void OutputJson()
+        {}
+
+        public static void UpdateInput(string InputString)
+        {
+
         }
 
         public static bool AskYesOrNo(string question, bool acceptEnterAsYes = true)

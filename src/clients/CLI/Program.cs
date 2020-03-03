@@ -40,17 +40,21 @@ namespace Repo.Clients.CLI
             string[] newArgs = args.Skip(1).ToArray();
             // foreach(var i in args)
             //System.Console.WriteLine(i);
-            if (CommandName.Equals("publish")) return await CommandLineApplication.ExecuteAsync<PublishCommand>(newArgs);
-            else if (CommandName.Equals("add")) return await CommandLineApplication.ExecuteAsync<AddCommand>(newArgs);
-            else if (CommandName.Equals("init")) return await CommandLineApplication.ExecuteAsync<InitCommand>(newArgs);
-            else if (CommandName.Equals("delete")) return await CommandLineApplication.ExecuteAsync<DeleteCommand>(newArgs);
-            else if (CommandName.Equals("list") || CommandName.Equals("ls")) return await CommandLineApplication.ExecuteAsync<ListCommand>(newArgs);
-            else if (CommandName.Equals("info")) return await CommandLineApplication.ExecuteAsync<InfoCommand>(newArgs);
-            else if (CommandName.Equals("backup")) return await CommandLineApplication.ExecuteAsync<BackupCommand>(newArgs);
-            else if (CommandName.Equals("compress")) return await CommandLineApplication.ExecuteAsync<CompressCommand>(newArgs);
-            else if (CommandName.Equals("deploy")) return await CommandLineApplication.ExecuteAsync<DeployCommand>(newArgs);
-            else if (CommandName.Equals("-v") || CommandName.Equals("--version") || CommandName.Equals("version")) return Console.ShowVersion();
-            else return Console.PrintListOfActions();
+            //if --json is present
+            Console.Init(newArgs);
+            int ActionExitCode = 0;
+            if (CommandName.Equals("publish")) ActionExitCode = await CommandLineApplication.ExecuteAsync<PublishCommand>(newArgs);
+            else if (CommandName.Equals("add")) ActionExitCode = await CommandLineApplication.ExecuteAsync<AddCommand>(newArgs);
+            else if (CommandName.Equals("init")) ActionExitCode =  await CommandLineApplication.ExecuteAsync<InitCommand>(newArgs);
+            else if (CommandName.Equals("delete")) ActionExitCode = await CommandLineApplication.ExecuteAsync<DeleteCommand>(newArgs);
+            else if (CommandName.Equals("list") || CommandName.Equals("ls")) ActionExitCode = await CommandLineApplication.ExecuteAsync<ListCommand>(newArgs);
+            else if (CommandName.Equals("info")) ActionExitCode = await CommandLineApplication.ExecuteAsync<InfoCommand>(newArgs);
+            else if (CommandName.Equals("backup")) ActionExitCode = await CommandLineApplication.ExecuteAsync<BackupCommand>(newArgs);
+            else if (CommandName.Equals("compress")) ActionExitCode = await CommandLineApplication.ExecuteAsync<CompressCommand>(newArgs);
+            else if (CommandName.Equals("deploy")) ActionExitCode = await CommandLineApplication.ExecuteAsync<DeployCommand>(newArgs);
+            else if (CommandName.Equals("-v") || CommandName.Equals("--version") || CommandName.Equals("version")) ActionExitCode = Console.ShowVersion();
+            else ActionExitCode = Console.PrintListOfActions();
+            return ActionExitCode;
         }
     }
 }

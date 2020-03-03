@@ -45,7 +45,7 @@ namespace Repo.Clients.CLI.Commands
         [Option("-u|--repo-url", "Give Repo server URL.", CommandOptionType.SingleValue)]
         public string RepoSourceURL { get; set; }
 
-        [Option("-o|--file", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
         public string OutputJSONFile { get; set; }
 
         private async Task OnExecuteAsync()

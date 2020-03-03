@@ -7,6 +7,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.IO.Compression;
 
 namespace Repo.Clients.CLI
 {
@@ -612,6 +614,56 @@ namespace Repo.Clients.CLI
                 }
             }
             catch(Exception ex){Logger.Do("DoCacheCleanUpIfNeeded " + ex.StackTrace);}
+        }
+
+        public static string GetResourceChecksum(string ResourceFilePath)
+        {
+            FileStream  fileStream = new FileStream(ResourceFilePath, FileMode.OpenOrCreate, FileAccess.Read);
+            using (var bufferedStream = new BufferedStream(fileStream, 1024 * 32))
+            {
+                var sha = new SHA512Managed();
+                byte[] checksum = sha.ComputeHash(bufferedStream);
+                return BitConverter.ToString(checksum).Replace("-", String.Empty);
+            }
+        }
+
+        public static void DoCompress(string FolderToCompress, string CompressFile, List<string> ListOfEntriesToIgnoure )
+        {
+            ZipFile.CreateFromDirectory(FolderToCompress, CompressFile);               
+            using (FileStream zipToOpen = new FileStream(CompressFile, FileMode.Open))
+            {
+                List<string> ListOfEntriesToDelete = new List<string>();
+                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                {
+                    for(int i=0; i< archive.Entries.Count; i++)
+                    {                            
+                        if(NeedToIgnoreEntryToCompress(archive.Entries[i].FullName, ListOfEntriesToIgnoure))
+                        {                                
+                            ListOfEntriesToDelete.Add(archive.Entries[i].FullName);  
+                        }     
+                        else Logger.Do(archive.Entries[i].FullName);                    
+                    }   
+                    for(int i=0;i<ListOfEntriesToDelete.Count;i++)
+                    {
+                        ZipArchiveEntry entry = archive.GetEntry(ListOfEntriesToDelete[i]);
+                        if (entry != null)
+                        {
+                            Logger.Do("Deleting " + entry.FullName);
+                            entry.Delete();
+                        }
+                    }                                         
+                }
+                
+            }   
+        }
+
+        private static bool NeedToIgnoreEntryToCompress(string EntryName, List<string> ListOfEntriesToIgnoure)
+        {
+            for(int i=0;i<ListOfEntriesToIgnoure.Count;i++)
+            {
+                if(EntryName.Contains(ListOfEntriesToIgnoure[i])) return true;
+            }
+            return false;
         }
 
     }
