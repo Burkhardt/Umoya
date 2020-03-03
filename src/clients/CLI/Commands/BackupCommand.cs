@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using McMaster.Extensions.CommandLineUtils;
+using System.IO.Compression;
+using System.IO;
 
 namespace Repo.Clients.CLI.Commands
 {
@@ -18,21 +20,25 @@ namespace Repo.Clients.CLI.Commands
     class BackupCommand
     {
 
+        private static List<string> ListOfFoldersToIgnoreForBackup = new List<string>() { ".umoya"+ Constants.PathSeperator +"publish", ".umoya" + Constants.PathSeperator + ".git" + Constants.PathSeperator, ".umoya" + Constants.PathSeperator + "resources" + Constants.PathSeperator + "obj", ".umoya" + Constants.PathSeperator + "resources" + Constants.PathSeperator + "cache" + Constants.PathSeperator , ".umoya" + Constants.PathSeperator + "temp" };
         [Required]
-        [Argument(0, "FilePath", Description = "Give Backup file path (.zip)")]
+        [Argument(0, "FilePath", Description = "Give file path where you want to backup")]
         public string BackupFilePath { get; set; }
 
         private async Task OnExecuteAsync()
         {
             try
-            {
-
+            {                   
+                Resources.DoCompress(Constants.ZmodDefaultHome, BackupFilePath, ListOfFoldersToIgnoreForBackup);                
                 Console.PrintActionPerformSuccessfully(Constants.BackupCommandName); 
             }
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
             catch (Exceptions.ResourceInfoInvalidFormatException etr) { Logger.Do(etr.Message); }
             catch (Exception ex) { Console.LogError(ex.Message); }
         }
+
+        
+        
         private static string GetVersion()
                     => typeof(DeleteCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 

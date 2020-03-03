@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using McMaster.Extensions.CommandLineUtils;
+using System.IO;
 
 namespace Repo.Clients.CLI.Commands
 {
@@ -30,6 +32,10 @@ namespace Repo.Clients.CLI.Commands
         {
             try
             {
+                //Extract folder
+                if(!Directory.Exists(FolderPathToDeploy)) throw new Exception("Folder path is not present");
+                if(!File.Exists(CompressRepoFilePath)) throw new Exception("Given compressed file is not present.");
+                ZipFile.ExtractToDirectory(CompressRepoFilePath, FolderPathToDeploy);
                 Console.PrintActionPerformSuccessfully(Constants.DeployCommandName); 
             }
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
