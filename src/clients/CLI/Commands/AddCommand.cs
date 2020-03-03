@@ -44,7 +44,7 @@ namespace Repo.Clients.CLI.Commands
         private async Task OnExecuteAsync()
         {
             try
-            {
+            {            
                 string TempResourceName = string.Empty;
                 string GitHubResourceRepoURL = ConfigurationManager.AppSettings["GithubRepository"];
                 ResourceIdentifier ResourceId;
@@ -106,7 +106,7 @@ namespace Repo.Clients.CLI.Commands
                     #region Clear Temp Cache
                     List<string> ErrorInfo = new List<string>();
                     List<string> OutputInfo = new List<string>();
-                    string ClearCacheCommandString = "nuget locals temp -c";
+                    string ClearCacheCommandString = "nuget locals global-packages -c";
                     Logger.Do("Clearning Temp Cache for Nuget " + ClearCacheCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, ClearCacheCommandString, out OutputInfo, Constants.ResourceDirecotryDefaultPath);
                     ClearCacheCommandString = "nuget locals http-cache -c";
@@ -169,6 +169,7 @@ namespace Repo.Clients.CLI.Commands
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
             catch (Exceptions.ResourceInfoInvalidFormatException etr) { Logger.Do(etr.Message); }
             catch (Exception ex) { Console.LogError(ex.Message); }
+            Console.Close();
         }
 
         private bool IsResourceVersionGiven(string ResourceVersion)
