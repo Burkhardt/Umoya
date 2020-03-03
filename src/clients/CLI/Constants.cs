@@ -71,6 +71,6 @@ namespace Repo.Clients.CLI
         public const string CompressCommandDescription = "Compress resource(s) and its depenent resource(s) into .zip file.";
 
         public const string DeployCommandName = "deploy";
-        public const string DeployCommandDescription = "Deploy repository and its dependent resource(s) to given repository folder.";
+        public const string DeployCommandDescription = "Deploy resource(s) and their dependent resource(s) of repository to given folder.";
     }
 }
