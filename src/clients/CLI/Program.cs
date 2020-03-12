@@ -54,6 +54,7 @@ namespace Repo.Clients.CLI
             else if (CommandName.Equals("deploy")) ActionExitCode = await CommandLineApplication.ExecuteAsync<DeployCommand>(newArgs);
             else if (CommandName.Equals("-v") || CommandName.Equals("--version") || CommandName.Equals("version")) ActionExitCode = Console.ShowVersion();
             else ActionExitCode = Console.PrintListOfActions();
+            Console.Close(ActionExitCode);
             return ActionExitCode;
         }
     }

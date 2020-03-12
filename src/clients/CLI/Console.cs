@@ -17,6 +17,8 @@ namespace Repo.Clients.CLI
         private static System.ConsoleColor TableFrameColor = System.ConsoleColor.White;
         private static System.ConsoleColor QuestionColor = System.ConsoleColor.White;
         private static System.ConsoleColor TaskPassColor = System.ConsoleColor.Green;
+
+        //Need to initialize RootJSONOutput
         private static Dictionary<string, string> listOfCommandsDescription = new Dictionary<string, string> {
             { Constants.InitCommandName, Constants.InitCommandDescription},
             { Constants.InfoCommandName, Constants.InfoCommandDescription},
@@ -120,16 +122,18 @@ namespace Repo.Clients.CLI
         {
             //Find action and set IsListAction = true
             //Find JSON output option and if found then set IsJSONOutput = true;
-            //
+            //Need to call UpdateInput function
         }
 
-        public static void Close()
+        public static void Close(int ExitCode)
         {
-            if(IsJSONOutput) OutputJson();
+            if(IsJSONOutput) OutputJson(ExitCode);
         }
 
-        public static void OutputJson()
-        {}
+        public static void OutputJson(int ExitCode)
+        {
+            //Serialize JSON and create JSON File
+        }
 
         public static void UpdateInput(string InputString)
         {
