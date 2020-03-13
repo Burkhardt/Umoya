@@ -116,6 +116,14 @@ namespace Repo.Clients.CLI
             }
             WriteLine(LogMessage, TaskPassColor);
         }
+        public static void LogWriteLine(string LogMessage)
+        {
+            if (IsJSONOutput)
+            {
+                UpdateInput(LogMessage);
+            }
+            WriteLine(LogMessage, WriteColor);
+        }
 
         public static void LogError(string LogMessage)
         {
@@ -139,10 +147,11 @@ namespace Repo.Clients.CLI
             input = string.Join(" ", args.Skip(1));
             if (input.Contains("-j") || input.Contains("--json"))
                 IsJSONOutput = true;
+                if(actionName.ToLower()=="list" || actionName.ToLower()== "ls")
+                IsListAction = true;
             //Find action and set IsListAction = true
             //Find JSON output option and if found then set IsJSONOutput = true;
             //Need to call UpdateInput function
-
         }
 
         public static void Close( string fileName)
@@ -249,19 +258,19 @@ namespace Repo.Clients.CLI
         {
             System.Console.WriteLine();
             Console.WriteLine("Configuration:", System.ConsoleColor.Blue);
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "ZMOD Home ") + "\t : " + Info.Instance.ZmodHome);
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "Umoya Home ") + "\t : " + Info.Instance.UmoyaHome);
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "Owner ") + "\t : " + Info.Instance.Owner);
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "Version ") + "\t : " + Info.Instance.Version);
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "ZMOD Home ") + "\t : " + Info.Instance.ZmodHome);
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "Umoya Home ") + "\t : " + Info.Instance.UmoyaHome);
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "Owner ") + "\t : " + Info.Instance.Owner);
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "Version ") + "\t : " + Info.Instance.Version);
             if (Info.Instance.Source.Url != null && Info.Instance.Source.Url != "")
-                LogLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + Info.Instance.Source.Url + ", You can update this with CLI umoya info -u <repo url>.");
-            else LogLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + "No Repo URL exists. You can update this with CLI umoya info -u <repo url>");
+                LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + Info.Instance.Source.Url + ", You can update this with CLI umoya info -u <repo url>.");
+            else LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + "No Repo URL exists. You can update this with CLI umoya info -u <repo url>");
             if (Info.Instance.Source.Accesskey != null && Info.Instance.Source.Accesskey != "")
-                LogLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + Info.Instance.Source.Accesskey);
+                LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + Info.Instance.Source.Accesskey);
             else
-                LogLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + "No Key found; You need to set with CLI umoya info -k <your key>");
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "ShowProgress") + "\t : " + Info.Instance.ShowProgress);
-            LogLine(Console.FormatActionNameToPringInConsole(" " + "IsDebugging") + "\t : " + Info.Instance.ISDebugging);
+                LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + "No Key found; You need to set with CLI umoya info -k <your key>");
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "ShowProgress") + "\t : " + Info.Instance.ShowProgress);
+            LogWriteLine(Console.FormatActionNameToPringInConsole(" " + "IsDebugging") + "\t : " + Info.Instance.ISDebugging);
             System.Console.WriteLine();
         }
         public static int ShowVersion()
