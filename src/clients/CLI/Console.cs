@@ -175,7 +175,6 @@ namespace Repo.Clients.CLI
                 rootJsonOutputFile.output = ActionInput;
             }
             var JsonString = Newtonsoft.Json.JsonConvert.SerializeObject(rootJsonOutputFile);
-            System.Console.WriteLine(JsonString);
             File.WriteAllText(fileName, JsonString);
         }
 
