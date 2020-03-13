@@ -10,15 +10,21 @@ namespace Repo.Clients.CLI
     {
         private static bool IsJSONOutput = false;
         private static bool IsListAction = false;
-        private static string[] ActionInput = new string[]{};
+        private static bool IsError = false;
+        private static List<string> ActionInput = new List<string>();
+        private static List<string> ActionError = new List<string>();
+        private static string actionName = string.Empty;
+        private static string input = string.Empty;
         private static System.ConsoleColor WarningColor = System.ConsoleColor.Yellow;
         private static System.ConsoleColor ErrorColor = System.ConsoleColor.Red;
         private static System.ConsoleColor TableHeaderColor = System.ConsoleColor.Yellow;
         private static System.ConsoleColor TableFrameColor = System.ConsoleColor.White;
         private static System.ConsoleColor QuestionColor = System.ConsoleColor.White;
+        private static System.ConsoleColor WriteColor = System.ConsoleColor.White;
         private static System.ConsoleColor TaskPassColor = System.ConsoleColor.Green;
 
         //Need to initialize RootJSONOutput
+        // private static RootJsonOutput rootJsonOutputFile;
         private static Dictionary<string, string> listOfCommandsDescription = new Dictionary<string, string> {
             { Constants.InitCommandName, Constants.InitCommandDescription},
             { Constants.InfoCommandName, Constants.InfoCommandDescription},
@@ -60,10 +66,10 @@ namespace Repo.Clients.CLI
             System.Console.WriteLine(FormatActionNameToPringInConsole("Repo", 10) + "\t" +
             Info.Instance.Source.Url + ", You can update this with CLI umoya info -u <repo url>.");
             System.Console.WriteLine(FormatActionNameToPringInConsole("AccessKey", 10) + "\t" + Info.Instance.Source.Accesskey);
-            System.Console.WriteLine();            
+            System.Console.WriteLine();
             string ZMODInitString = ZMODInitializeString();
-            if(IsConfigured) Console.LogLine(ZMODInitString);
-            else 
+            if (IsConfigured) Console.LogLine(ZMODInitString);
+            else
             {
                 Console.LogError(ZMODInitString);
                 System.Console.WriteLine("  >>  To initialize ZMOD here, use command : umoya init");
@@ -104,44 +110,87 @@ namespace Repo.Clients.CLI
 
         public static void LogLine(string LogMessage)
         {
+            if (IsJSONOutput)
+            {
+                UpdateInput(LogMessage);
+            }
             WriteLine(LogMessage, TaskPassColor);
         }
 
         public static void LogError(string LogMessage)
         {
             //If with json or not
+            if (IsJSONOutput)
+            {
+                IsError = true;
+                UpdateInput(LogMessage);
+            }
             WriteLine(LogMessage, ErrorColor);
         }
-
         public static void LogWarning(string LogMessage)
         {
+            if (IsJSONOutput)
+            { UpdateInput(LogMessage); }
             WriteLine(LogMessage, WarningColor);
         }
-
         public static void Init(string[] args)
         {
+            actionName = args[0].ToLower();
+            input = string.Join(" ", args.Skip(1));
+            if (input.Contains("-j") || input.Contains("--json"))
+                IsJSONOutput = true;
             //Find action and set IsListAction = true
             //Find JSON output option and if found then set IsJSONOutput = true;
             //Need to call UpdateInput function
+
         }
 
-        public static void Close(int ExitCode)
+        public static void Close( string fileName)
         {
-            if(IsJSONOutput) OutputJson(ExitCode);
+            if (IsJSONOutput)
+                OutputJson(fileName);
         }
 
-        public static void OutputJson(int ExitCode)
+        public static void OutputJson(string fileName)
         {
             //Serialize JSON and create JSON File
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+            RootJsonOutput rootJsonOutputFile = new RootJsonOutput();
+            rootJsonOutputFile.action = actionName;
+            rootJsonOutputFile.input = input;
+
+
+
+            if (IsError)
+            {
+                rootJsonOutputFile.status = false;
+                rootJsonOutputFile.errorMessage = ActionError;
+            }
+            else
+            {
+                rootJsonOutputFile.status = true;
+                rootJsonOutputFile.output = ActionInput;
+            }
+            var JsonString = Newtonsoft.Json.JsonConvert.SerializeObject(rootJsonOutputFile);
+            System.Console.WriteLine(JsonString);
+            File.WriteAllText(fileName, JsonString);
         }
 
         public static void UpdateInput(string InputString)
         {
-
+            if (!IsError)
+                ActionInput.Add(InputString);
+            else
+                ActionError.Add(InputString);
         }
 
         public static bool AskYesOrNo(string question, bool acceptEnterAsYes = true)
         {
+             if (IsJSONOutput)
+            { UpdateInput(question); }
             bool? response = null;
 
             while (!response.HasValue)
@@ -180,7 +229,7 @@ namespace Repo.Clients.CLI
             return typeof(Console).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         }
 
-        public static int SetInfoConfigurationValues(string RepoSourceURL, string Accesskey, string Owner, bool ISDebugging ,bool ShowProgress)
+        public static int SetInfoConfigurationValues(string RepoSourceURL, string Accesskey, string Owner, bool ISDebugging, bool ShowProgress)
         {
             try
             {
@@ -188,8 +237,8 @@ namespace Repo.Clients.CLI
                 if (IsZMODConfigured())
                 {
                     // bool Status = bool.Parse(StatusInString);
-                    Logger.Do("SetInfoConfigurationValues " +  RepoSourceURL + "  " + Accesskey + "  " + ISDebugging + " " +Owner  +"  " + ShowProgress);
-                    FSOps.UpdateInfoValue(RepoSourceURL, Accesskey, Owner, ISDebugging ,ShowProgress);
+                    Logger.Do("SetInfoConfigurationValues " + RepoSourceURL + "  " + Accesskey + "  " + ISDebugging + " " + Owner + "  " + ShowProgress);
+                    FSOps.UpdateInfoValue(RepoSourceURL, Accesskey, Owner, ISDebugging, ShowProgress);
                     return 1;
                 }
                 else throw new Exceptions.ConfigurationNotFoundException();
@@ -201,17 +250,19 @@ namespace Repo.Clients.CLI
         {
             System.Console.WriteLine();
             Console.WriteLine("Configuration:", System.ConsoleColor.Blue);
-            //ToDo Surbhi
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "ZMOD Home ") + "\t : " + Info.Instance.ZmodHome);
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Umoya Home ") + "\t : " + Info.Instance.UmoyaHome);
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Owner ") + "\t : " + Info.Instance.Owner);
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Version ") + "\t : " + Info.Instance.Version);
-            if (Info.Instance.Source.Url != null && Info.Instance.Source.Url != "") System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + Info.Instance.Source.Url + ", You can update this with CLI umoya info -u <repo url>.");
-            else System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + "No Repo URL exists. You can update this with CLI umoya info -u <repo url>");
-            if (Info.Instance.Source.Accesskey != null && Info.Instance.Source.Accesskey != "") System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + Info.Instance.Source.Accesskey);
-            else System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + "No Key found; You need to set with CLI umoya info -k <your key>");
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "ShowProgress") + "\t : " + Info.Instance.ShowProgress);
-            System.Console.WriteLine(Console.FormatActionNameToPringInConsole(" " + "IsDebugging") + "\t : " + Info.Instance.ISDebugging);
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "ZMOD Home ") + "\t : " + Info.Instance.ZmodHome);
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "Umoya Home ") + "\t : " + Info.Instance.UmoyaHome);
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "Owner ") + "\t : " + Info.Instance.Owner);
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "Version ") + "\t : " + Info.Instance.Version);
+            if (Info.Instance.Source.Url != null && Info.Instance.Source.Url != "")
+                LogLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + Info.Instance.Source.Url + ", You can update this with CLI umoya info -u <repo url>.");
+            else LogLine(Console.FormatActionNameToPringInConsole(" " + "Repo", 10) + "\t : " + "No Repo URL exists. You can update this with CLI umoya info -u <repo url>");
+            if (Info.Instance.Source.Accesskey != null && Info.Instance.Source.Accesskey != "")
+                LogLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + Info.Instance.Source.Accesskey);
+            else
+                LogLine(Console.FormatActionNameToPringInConsole(" " + "AccessKey", 10) + "\t : " + "No Key found; You need to set with CLI umoya info -k <your key>");
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "ShowProgress") + "\t : " + Info.Instance.ShowProgress);
+            LogLine(Console.FormatActionNameToPringInConsole(" " + "IsDebugging") + "\t : " + Info.Instance.ISDebugging);
             System.Console.WriteLine();
         }
         public static int ShowVersion()

@@ -1,6 +1,3 @@
-using System;
-using System.Configuration;
-
 namespace Repo.Clients.CLI
 {
     public class Logger

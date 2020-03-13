@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace Repo.Clients.CLI.Commands
@@ -28,7 +27,8 @@ namespace Repo.Clients.CLI.Commands
     
         [Option("-f|--from", "Set (local or repo), where you want to remove resource. Default is local.", CommandOptionType.SingleValue)]
         public string From { get; set; } = FromOptionValue;
-
+ [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         private async Task OnExecuteAsync()
         {
             try
@@ -46,7 +46,7 @@ namespace Repo.Clients.CLI.Commands
                 if (!Console.IsZMODConfigured()) throw new Exceptions.ConfigurationNotFoundException(Constants.DeleteCommandName);
                 if(FromLocalOption)
                 {
-                    Console.WriteLine("> Checking resource in ZMOD (local).", System.Console.ForegroundColor);
+                    Console.LogLine("> Checking resource in ZMOD (local).");
                     Dictionary<Resources.ResourceType, Dictionary<string, ResourceIdentifier>> ListOfLocalResources = new Dictionary<Resources.ResourceType, Dictionary<string, ResourceIdentifier>>();
                     ListOfLocalResources = await Resources.GetLocalResourceList(Resources.ResourceType.Any);
                     foreach(string ResourceName in ListOfLocalResources[Resources.ResourceType.Model].Keys)
@@ -60,11 +60,11 @@ namespace Repo.Clients.CLI.Commands
                         ListOfInterestedResourcesToProcess.Add(ResourceId);
                         if(ResourceId.HasVersion())
                         {
-                            Console.WriteLine("> Getting resource (and its dependencies) in ZMOD.", System.Console.ForegroundColor);
+                            Console.LogLine("> Getting resource (and its dependencies) in ZMOD.");
                             ListOfInterestedResourcesToProcess.AddRange(await Resources.GetDependentResources(ResourceId));
                             List<string> ErrorInfo = new List<string>();
                             List<string> OutputInfo = new List<string>();
-                            Console.WriteLine("> Deleting resource.", System.Console.ForegroundColor);
+                            Console.LogLine("> Deleting resource.");
                             string DeleteResourceCommandString = "remove package " + ResourceId.ResourceName;
                             Logger.Do("Nuget delete package command " + DeleteResourceCommandString);
                             ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, DeleteResourceCommandString, out OutputInfo, Constants.ResourceDirecotryDefaultPath);

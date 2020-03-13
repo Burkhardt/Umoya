@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace Repo.Clients.CLI.Commands
@@ -22,7 +21,8 @@ namespace Repo.Clients.CLI.Commands
         [Required]
         [Argument(0, "FilePath", Description = "Give file path (.zip) of compressed repository.")]
         public string CompressRepoFilePath { get; set; }
-
+[Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         private async Task OnExecuteAsync()
         {
             try

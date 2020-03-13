@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.IO;
 using DotNetSearch;
-using  System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Repo.Clients.CLI
 {
@@ -41,11 +41,21 @@ namespace Repo.Clients.CLI
             // foreach(var i in args)
             //System.Console.WriteLine(i);
             //if --json is present
-            Console.Init(newArgs);
+            string NextOf = string.Empty;
+            if (newArgs.ToList().Contains("-j") || newArgs.ToList().Contains("--json"))
+            {
+                if (newArgs.ToList().Contains("-j"))
+                    NextOf = "-j";
+                else
+                    NextOf = "--json";
+                Console.Init(args);
+            }
+            string fileName;
+            fileName = args.SkipWhile(x => x != NextOf).Skip(1).DefaultIfEmpty(args[0]).FirstOrDefault();
             int ActionExitCode = 0;
             if (CommandName.Equals("publish")) ActionExitCode = await CommandLineApplication.ExecuteAsync<PublishCommand>(newArgs);
             else if (CommandName.Equals("add")) ActionExitCode = await CommandLineApplication.ExecuteAsync<AddCommand>(newArgs);
-            else if (CommandName.Equals("init")) ActionExitCode =  await CommandLineApplication.ExecuteAsync<InitCommand>(newArgs);
+            else if (CommandName.Equals("init")) ActionExitCode = await CommandLineApplication.ExecuteAsync<InitCommand>(newArgs);
             else if (CommandName.Equals("delete")) ActionExitCode = await CommandLineApplication.ExecuteAsync<DeleteCommand>(newArgs);
             else if (CommandName.Equals("list") || CommandName.Equals("ls")) ActionExitCode = await CommandLineApplication.ExecuteAsync<ListCommand>(newArgs);
             else if (CommandName.Equals("info")) ActionExitCode = await CommandLineApplication.ExecuteAsync<InfoCommand>(newArgs);
@@ -54,7 +64,7 @@ namespace Repo.Clients.CLI
             else if (CommandName.Equals("deploy")) ActionExitCode = await CommandLineApplication.ExecuteAsync<DeployCommand>(newArgs);
             else if (CommandName.Equals("-v") || CommandName.Equals("--version") || CommandName.Equals("version")) ActionExitCode = Console.ShowVersion();
             else ActionExitCode = Console.PrintListOfActions();
-            Console.Close(ActionExitCode);
+            Console.Close(fileName);
             return ActionExitCode;
         }
     }

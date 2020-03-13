@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using DotNetSearch.Extensions;
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using static Repo.Clients.CLI.Resources;
 
 namespace Repo.Clients.CLI.Commands

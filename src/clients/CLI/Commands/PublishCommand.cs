@@ -1,9 +1,7 @@
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
-using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
@@ -49,6 +47,8 @@ namespace Repo.Clients.CLI.Commands
 
         public string DependentResource { get; set; }
 
+[Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         private async Task OnExecuteAsync()
         {
             try
@@ -157,7 +157,7 @@ namespace Repo.Clients.CLI.Commands
                 //Copy resource to content folder according to resource file
                 Logger.Do("Copying Resource " + Environment.CurrentDirectory + Constants.PathSeperator + ResourceFile);
                 File.Copy(ResourceFile, TempResourcePackDirPath + Constants.PathSeperator + "contentFiles" + Constants.PathSeperator + ResourceType + Constants.PathSeperator + ResourceName, true);
-                Console.WriteLine("> Resource is prepared from template.", System.Console.ForegroundColor);
+                Console.LogLine("> Resource is prepared from template.");
                 #endregion
 
                 #region Update resource-spec nuget file with interested resource detail in temp folder/resource-spec
@@ -173,7 +173,7 @@ namespace Repo.Clients.CLI.Commands
                 TempSpecContent = TempSpecContent.Replace("${Dependencies}", TempResourceDependenciesInSpec);
                 Logger.Do("New Spec " + TempSpecContent);
                 File.WriteAllText(TempResourcePackNugetSpecFilePath, TempSpecContent);
-                Console.WriteLine("> Resource spec is built.", System.Console.ForegroundColor);
+                Console.LogLine("> Resource spec is built.");
                 #endregion
 
                 #region Do pack and publish to folder
@@ -185,7 +185,7 @@ namespace Repo.Clients.CLI.Commands
                 Logger.Do("Packing " + PackCommandString);
                 ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, PackCommandString, out OutputInfo);
                 if (ErrorInfo.Count > 0) throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.PublishCommandName, string.Join('\n', ErrorInfo));
-                else Console.WriteLine("> Resource is packed.", System.Console.ForegroundColor);
+                else Console.LogLine("> Resource is packed.");
                 #endregion
 
                 #region Do push nuget publish/package with source configuration  
@@ -199,7 +199,7 @@ namespace Repo.Clients.CLI.Commands
                 }
                 if (HasConflictResourceOnRepo) throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.PublishCommandName, "ResourceInfo (" + ResourceName + "@" + ResourceVersion + ") is already present on Repo, Try with different name and or version).");
                 else if (ErrorInfo.Count > 0) throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.PublishCommandName, string.Join('\n', ErrorInfo));
-                else Console.WriteLine("> Resource pushed to Repo (" + Info.Instance.Source.Url + ")", System.Console.ForegroundColor);
+                else Console.LogLine("> Resource pushed to Repo (" + Info.Instance.Source.Url + ")");
                 #endregion
                 Console.PrintActionPerformSuccessfully(Constants.PublishCommandName);
             }

@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -37,6 +36,8 @@ namespace Repo.Clients.CLI.Commands
         [Option("-ol|--offline", "Set True If You want to add resource from cache only as off-line (default is false) --from-cache true", CommandOptionType.SingleValue)]
         public bool CacheStrategy { get; set; } = Constants.DefaultCacheStrategy;
 
+        [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         public string ResourceName { get; set; }
         public string ResourceType { get; set; }
 
@@ -100,7 +101,7 @@ namespace Repo.Clients.CLI.Commands
                     List<ResourceIdentifier> ListOfInterestedResourcesToProcess = new List<ResourceIdentifier>();
                     // Need to resolve when version is not passed
                     #region to check given resource and version is present.
-                    Console.WriteLine("> Checking resource in Repo.", System.Console.ForegroundColor);
+                    Console.LogLine("> Checking resource in Repo.");
                     if (!await Resources.IsResourcePresentInRepoAsync(ResourceId, CacheStrategy)) throw new Exceptions.ResourceNotFoundInRepoException(Constants.AddCommandName);
                     #endregion
                     #region Clear Temp Cache
@@ -121,11 +122,11 @@ namespace Repo.Clients.CLI.Commands
                     Logger.Do("Get resource info from repo");
                     if(CacheStrategy)
                     {
-                        Console.WriteLine("> Started using resource from cache.", System.Console.ForegroundColor);
+                        Console.LogLine("> Started using resource from cache.");
                     }
                     else
                     {
-                        Console.WriteLine("> Started downloading resource from Repo.", System.Console.ForegroundColor);
+                        Console.LogLine("> Started downloading resource from Repo.");
                         if(!HasResourceVersion) 
                         {
                             Logger.Do("Got latest version " + ResourceVersion);
@@ -137,7 +138,7 @@ namespace Repo.Clients.CLI.Commands
                     Logger.Do("Add nuget command string " + AddCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, AddCommandString, out OutputInfo);
                     if (ErrorInfo.Count > 0) throw new Exceptions.ActionNotSuccessfullyPerformException(Name, string.Join('\n', ErrorInfo));
-                    else Console.WriteLine("> Resource is downloaded.", System.Console.ForegroundColor);
+                    else Console.LogLine("> Resource is downloaded.");
                     #endregion
                     
                     #region Resolving ZMOD Dir
@@ -152,7 +153,7 @@ namespace Repo.Clients.CLI.Commands
                         Logger.Do("Interested Resource to process " + RId.ToString());
                         FSOps.AddFromCacheToZMOD(RId);
                     }                  
-                    Console.WriteLine("> Resource (and its dependencies) are resolved and added into ZMOD.", System.Console.ForegroundColor);
+                    Console.LogLine("> Resource (and its dependencies) are resolved and added into ZMOD.");
                     #endregion
                     #region Clean up local resource cache  
                     foreach(ResourceIdentifier RId in ListOfInterestedResourcesToProcess)
@@ -160,7 +161,7 @@ namespace Repo.Clients.CLI.Commands
                         Logger.Do("Clearning cache for resource " + RId.ToString());
                         FSOps.CleanUpCacheByResource(RId.ResourceName, RId.Version);
                     }                    
-                    Console.WriteLine("> Cleared resource cache.", System.Console.ForegroundColor);
+                    Console.LogLine("> Cleared resource cache.");
                     #endregion
                 }
                 else throw new Exceptions.ConfigurationNotSuccessfullyDoneException(Constants.AddCommandName);
@@ -169,7 +170,7 @@ namespace Repo.Clients.CLI.Commands
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
             catch (Exceptions.ResourceInfoInvalidFormatException etr) { Logger.Do(etr.Message); }
             catch (Exception ex) { Console.LogError(ex.Message); }
-            Console.Close();
+           // Console.Close();
         }
 
         private bool IsResourceVersionGiven(string ResourceVersion)

@@ -1,13 +1,10 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using LibGit2Sharp;
 using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 
 namespace Repo.Clients.CLI.Commands
 {
@@ -33,7 +30,8 @@ namespace Repo.Clients.CLI.Commands
                
         [Option("-r|--reset-forcefully", "This will forcefully reset existing configurations if already present.", CommandOptionType.SingleValue)]
         public bool ForceToOverWrite { get; set; }= false;
-
+  [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         private async Task OnExecuteAsync()
         {
             try
@@ -94,6 +92,7 @@ namespace Repo.Clients.CLI.Commands
                 }
                 
                 Console.LogLine("ZMOD initialized successfully.");
+               // Console.Close(OutputJSONFile);
             }
             catch(Exception ex)
             {

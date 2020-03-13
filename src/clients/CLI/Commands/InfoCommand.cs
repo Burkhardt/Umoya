@@ -32,6 +32,8 @@ namespace Repo.Clients.CLI.Commands
         [Option("-d|--debug", "Set debugging flag. (Default : false)", CommandOptionType.SingleValue)]
         public string ISDebugging { get; set; }
         
+        [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+        public string OutputJSONFile { get; set; }
         private async Task OnExecuteAsync()
         {
             Logger.Do("Command : Info is in process");

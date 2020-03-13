@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Repo.Clients.CLI
 {
     public class Package
-    {
-      
-
-        
+    {   
         public string Id { get; set; }
         public string Version { get; set; }
         public string Description { get; set; }
