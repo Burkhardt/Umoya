@@ -101,7 +101,7 @@ namespace Repo.Clients.CLI.Commands
                     List<ResourceIdentifier> ListOfInterestedResourcesToProcess = new List<ResourceIdentifier>();
                     // Need to resolve when version is not passed
                     #region to check given resource and version is present.
-                    Console.LogLine("> Checking resource in Repo.");
+                    Console.LogWriteLine("> Checking resource in Repo.");
                     if (!await Resources.IsResourcePresentInRepoAsync(ResourceId, CacheStrategy)) throw new Exceptions.ResourceNotFoundInRepoException(Constants.AddCommandName);
                     #endregion
                     #region Clear Temp Cache
@@ -122,11 +122,11 @@ namespace Repo.Clients.CLI.Commands
                     Logger.Do("Get resource info from repo");
                     if(CacheStrategy)
                     {
-                        Console.LogLine("> Started using resource from cache.");
+                        Console.LogWriteLine("> Started using resource from cache.");
                     }
                     else
                     {
-                        Console.LogLine("> Started downloading resource from Repo.");
+                        Console.LogWriteLine("> Started downloading resource from Repo.");
                         if(!HasResourceVersion) 
                         {
                             Logger.Do("Got latest version " + ResourceVersion);
@@ -138,7 +138,7 @@ namespace Repo.Clients.CLI.Commands
                     Logger.Do("Add nuget command string " + AddCommandString);
                     ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, AddCommandString, out OutputInfo);
                     if (ErrorInfo.Count > 0) throw new Exceptions.ActionNotSuccessfullyPerformException(Name, string.Join('\n', ErrorInfo));
-                    else Console.LogLine("> Resource is downloaded.");
+                    else Console.LogWriteLine("> Resource is downloaded.");
                     #endregion
                     
                     #region Resolving ZMOD Dir
@@ -153,7 +153,7 @@ namespace Repo.Clients.CLI.Commands
                         Logger.Do("Interested Resource to process " + RId.ToString());
                         FSOps.AddFromCacheToZMOD(RId);
                     }                  
-                    Console.LogLine("> Resource (and its dependencies) are resolved and added into ZMOD.");
+                    Console.LogWriteLine("> Resource (and its dependencies) are resolved and added into ZMOD.");
                     #endregion
                     #region Clean up local resource cache  
                     foreach(ResourceIdentifier RId in ListOfInterestedResourcesToProcess)
@@ -161,7 +161,7 @@ namespace Repo.Clients.CLI.Commands
                         Logger.Do("Clearning cache for resource " + RId.ToString());
                         FSOps.CleanUpCacheByResource(RId.ResourceName, RId.Version);
                     }                    
-                    Console.LogLine("> Cleared resource cache.");
+                    Console.LogWriteLine("> Cleared resource cache.");
                     #endregion
                 }
                 else throw new Exceptions.ConfigurationNotSuccessfullyDoneException(Constants.AddCommandName);

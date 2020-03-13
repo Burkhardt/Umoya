@@ -59,7 +59,8 @@ namespace Repo.Clients.CLI.Commands
                         string nugetPath = Constants.ResourceDirecotryDefaultPath + Constants.PathSeperator + "nuget.config";
                         Logger.Do("NeedToUpdate ProgressStatus " + NeedToUpdateProgressStatus);
                         if (!UpdateNugetConfig(nugetPath)) throw new Exceptions.ConfigurationNotFoundException(Constants.InfoCommandName);
-                        if (Console.SetInfoConfigurationValues(RepoSourceURL, Accesskey, Owner, Boolean.Parse(ISDebugging) , Boolean.Parse(ShowProgress)) > 0) Console.LogLine("Configurations are updated successfully.");
+                        if (Console.SetInfoConfigurationValues(RepoSourceURL, Accesskey, Owner, Boolean.Parse(ISDebugging) , Boolean.Parse(ShowProgress)) > 0) 
+                        Console.LogLine("Configurations are updated successfully.");
                         else throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.InfoCommandName, "Error When updating configurations");
                         Info.Instance.ReLoad();
                     }

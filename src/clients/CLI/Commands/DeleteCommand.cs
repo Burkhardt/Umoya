@@ -46,7 +46,7 @@ namespace Repo.Clients.CLI.Commands
                 if (!Console.IsZMODConfigured()) throw new Exceptions.ConfigurationNotFoundException(Constants.DeleteCommandName);
                 if(FromLocalOption)
                 {
-                    Console.LogLine("> Checking resource in ZMOD (local).");
+                    Console.LogWriteLine("> Checking resource in ZMOD (local).");
                     Dictionary<Resources.ResourceType, Dictionary<string, ResourceIdentifier>> ListOfLocalResources = new Dictionary<Resources.ResourceType, Dictionary<string, ResourceIdentifier>>();
                     ListOfLocalResources = await Resources.GetLocalResourceList(Resources.ResourceType.Any);
                     foreach(string ResourceName in ListOfLocalResources[Resources.ResourceType.Model].Keys)
@@ -60,11 +60,11 @@ namespace Repo.Clients.CLI.Commands
                         ListOfInterestedResourcesToProcess.Add(ResourceId);
                         if(ResourceId.HasVersion())
                         {
-                            Console.LogLine("> Getting resource (and its dependencies) in ZMOD.");
+                            Console.LogWriteLine("> Getting resource (and its dependencies) in ZMOD.");
                             ListOfInterestedResourcesToProcess.AddRange(await Resources.GetDependentResources(ResourceId));
                             List<string> ErrorInfo = new List<string>();
                             List<string> OutputInfo = new List<string>();
-                            Console.LogLine("> Deleting resource.");
+                            Console.LogWriteLine("> Deleting resource.");
                             string DeleteResourceCommandString = "remove package " + ResourceId.ResourceName;
                             Logger.Do("Nuget delete package command " + DeleteResourceCommandString);
                             ErrorInfo = PSOps.StartAndWaitForFinish(Constants.DotNetCommand, DeleteResourceCommandString, out OutputInfo, Constants.ResourceDirecotryDefaultPath);
