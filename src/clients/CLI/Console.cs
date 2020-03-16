@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Repo.Clients.CLI
 {
@@ -147,19 +148,41 @@ namespace Repo.Clients.CLI
             input = string.Join(" ", args.Skip(1));
             if (input.Contains("-j") || input.Contains("--json"))
                 IsJSONOutput = true;
-                if(actionName.ToLower()=="list" || actionName.ToLower()== "ls")
+            if (actionName.ToLower() == "list" || actionName.ToLower() == "ls")
                 IsListAction = true;
             //Find action and set IsListAction = true
             //Find JSON output option and if found then set IsJSONOutput = true;
             //Need to call UpdateInput function
         }
 
-        public static void Close( string fileName)
+        public static void Close(string fileName)
         {
-            if (IsJSONOutput)
+            if (IsJSONOutput && !IsListAction)
                 OutputJson(fileName);
+            if (IsListAction && IsJSONOutput)
+                OutputJsonForList(fileName);
         }
-
+        public static void OutputJsonForList(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                var jo = Newtonsoft.Json.JsonConvert.DeserializeObject<RootJsonOutput>(File.ReadAllText(fileName));
+                if (IsError)
+                {
+                    jo.status = false;
+                    jo.errorMessage = ActionError;
+                }
+                else
+                {
+                    jo.status = true;
+                }
+                string JsonString = JsonConvert.SerializeObject(jo,
+                                        Formatting.Indented,
+                                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                File.WriteAllText(fileName, JsonString);
+                LogLine("JSON file created succesfully.");
+            }
+        }
         public static void OutputJson(string fileName)
         {
             //Serialize JSON and create JSON File
@@ -170,9 +193,6 @@ namespace Repo.Clients.CLI
             RootJsonOutput rootJsonOutputFile = new RootJsonOutput();
             rootJsonOutputFile.action = actionName;
             rootJsonOutputFile.input = input;
-
-
-
             if (IsError)
             {
                 rootJsonOutputFile.status = false;
@@ -183,8 +203,12 @@ namespace Repo.Clients.CLI
                 rootJsonOutputFile.status = true;
                 rootJsonOutputFile.output = ActionInput;
             }
-            var JsonString = Newtonsoft.Json.JsonConvert.SerializeObject(rootJsonOutputFile);
+           
+            string JsonString = JsonConvert.SerializeObject(rootJsonOutputFile,
+                                Formatting.Indented,
+                                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             File.WriteAllText(fileName, JsonString);
+            LogLine("JSON file has been created.");
         }
 
         public static void UpdateInput(string InputString)
@@ -197,7 +221,7 @@ namespace Repo.Clients.CLI
 
         public static bool AskYesOrNo(string question, bool acceptEnterAsYes = true)
         {
-             if (IsJSONOutput)
+            if (IsJSONOutput)
             { UpdateInput(question); }
             bool? response = null;
 

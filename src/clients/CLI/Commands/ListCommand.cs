@@ -24,6 +24,8 @@ namespace Repo.Clients.CLI.Commands
         private static int SkipResultsDefault = 0;
         private static int TakeDefault = 10;
         private static string FromOptionValue = "local";
+        private static string actionName = string.Empty;
+        private static string otherInput = string.Empty;
 
         [Option("-f|--from", "Show resource(s) from Repo server or ZMOD local directory (default: local)", CommandOptionType.SingleValue)]
         public string From { get; set; } = FromOptionValue;
@@ -48,30 +50,33 @@ namespace Repo.Clients.CLI.Commands
 
         private async Task OnExecuteAsync()
         {
+            string[] args = Program.allAgrs;
+            actionName = args[0].ToString();
+            otherInput = string.Join(" ", args.Skip(1));
             Logger.Do("From " + From);
             try
             {
                 if (!Console.IsZMODConfigured()) throw new Exceptions.ConfigurationNotFoundException(Constants.ListCommandName);
                 #region List from Repo
                 //Add Invalid From option exception
-                // System.Console.WriteLine(From);
                 if (From.ToLower() == "repo")
                 {
                     var httpClient = new HttpClient();
                     var url = Resources.GetRepoSearchURL();
                     //Check Query Option entered from User
                     if (!String.IsNullOrEmpty(Query)) url = Resources.GetRepoSearchURLByQuery(Query);
-                    if(!String.IsNullOrEmpty(Type))
+                    if (!String.IsNullOrEmpty(Type))
                     {
-                        if(Resources.IsResourceTypeValid(Type)) url = RestOps.AppendQueryInEndPoint(url, "packageType", Type); 
+                        if (Resources.IsResourceTypeValid(Type)) url = RestOps.AppendQueryInEndPoint(url, "packageType", Type);
                         else throw new Exceptions.ResourceTypeInvalidException();
-                    }                        
+                    }
                     HttpResponseMessage ResponseFromRepo = await RestOps.GetResponseAsync(url);
                     if (!ResponseFromRepo.IsSuccessStatusCode) throw new Exceptions.ActionNotSuccessfullyPerformException(Constants.ListCommandName, "Repo server response " + ResponseFromRepo.StatusCode.ToString() + " " + ResponseFromRepo.ReasonPhrase + " " + ResponseFromRepo.Content);
                     var SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<ListResponse>();
-                    List<Package> ListOfResources;                    
+                    List<Package> ListOfResources;
                     ListOfResources = SearchResultSetInListOfResources.Data.Skip(Skip).Take(Take).ToList();
-                    PrintResults(ListOfResources, SearchResultSetInListOfResources.Data.Count());                    
+                    PrintResults(ListOfResources, SearchResultSetInListOfResources.Data.Count());
+                    
                 }
                 #endregion
                 #region List from local ZMOD
@@ -93,6 +98,7 @@ namespace Repo.Clients.CLI.Commands
         private void PrintResults(List<Package> package, int TotalHits)
         {
             PrintTable(package);
+            
             var numResultsToDisplay = Take < TotalHits ? Take : TotalHits;
             var starting = Skip + 1;
             var page = (Skip + Take) / Take;
@@ -100,6 +106,8 @@ namespace Repo.Clients.CLI.Commands
             if (ending > TotalHits)
                 ending = TotalHits;
             System.Console.WriteLine($"{Skip + 1} - {ending} of {TotalHits} results");
+            //System.Console.WriteLine(OutputJSONFile);
+           GenerateOutputJSONFile(package, null, From, OutputJSONFile, actionName,otherInput);
         }
 
         private void PrintResultsForLocal(List<ResourceIdentifier> package, int TotalHits)
@@ -111,7 +119,7 @@ namespace Repo.Clients.CLI.Commands
             var ending = page * Take;
             if (ending > TotalHits)
                 ending = TotalHits;
-            System.Console.WriteLine($"{Skip + 1} - {ending} of {TotalHits} results");
+            Console.LogWriteLine($"{Skip + 1} - {ending} of {TotalHits} results");
         }
 
         private static string GetResourceType(string TypeofResource)
@@ -431,23 +439,17 @@ namespace Repo.Clients.CLI.Commands
                     {
                         // We found a new package. Print divider
                         System.Console.WriteLine("".PadRight(headerWidth, rowDivider));
-
                     }
-
                     System.Console.Write(value.PadRight(columnWidths[j]));
-
                     if (j < columnWidths.Length - 1)
                     {
                         System.Console.Write(columnPad);
                     }
                 }
-
                 System.Console.WriteLine();
             }
-
             System.Console.WriteLine();
         }
-
         private async Task GetLocalLists()
         {
             Dictionary<Resources.ResourceType, Dictionary<string, ResourceIdentifier>> ListOfLocalResources =
@@ -466,7 +468,7 @@ namespace Repo.Clients.CLI.Commands
             }
             if (!String.IsNullOrEmpty(OutputJSONFile))
             {
-                if (!GenerateOutputJSONFile(null, ListOfResourceIdentifier, From, OutputJSONFile))
+                if (!GenerateOutputJSONFile(null, ListOfResourceIdentifier, From, OutputJSONFile, actionName, otherInput))
                     throw new Exceptions.OutputJsonFileException(Constants.ListCommandName);
             }
             if (!String.IsNullOrEmpty(Query))
@@ -486,7 +488,7 @@ namespace Repo.Clients.CLI.Commands
                 }
                 else
                 {
-                    System.Console.WriteLine(Type + " does not exists in the resource type. Specify Type as Data, Code, Model");
+                    Console.LogError(Type + " does not exists in the resource type. Specify Type as Data, Code, Model");
                     return;
                 }
             }

@@ -9,5 +9,7 @@ namespace Repo.Clients.CLI
         public List<string> output { get; set; }
         public List<string> errorMessage { get; set; }
         public bool status { get; set; }
+       public  List<Package> RepoItems{get; set;}
+       public  List<ResourceIdentifier> LocalItems{get; set;}
     }
 }

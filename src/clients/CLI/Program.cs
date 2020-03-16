@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Repo.Clients.CLI.Commands;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Diagnostics;
-using System.IO;
-using DotNetSearch;
-using System.Runtime.InteropServices;
 
 namespace Repo.Clients.CLI
 {
@@ -18,6 +10,8 @@ namespace Repo.Clients.CLI
     [VersionOptionFromMember(MemberName = nameof(Console.GetVersion))]
     class Program
     {
+
+public static string[] allAgrs = {};
         static int Main(string[] args)
         {
             int commandResult = 0;
@@ -38,6 +32,7 @@ namespace Repo.Clients.CLI
             Logger.Do(args[0] + "   " + Environment.CurrentDirectory);
             string CommandName = args[0].ToLower();
             string[] newArgs = args.Skip(1).ToArray();
+            allAgrs = args;
             // foreach(var i in args)
             //System.Console.WriteLine(i);
             //if --json is present

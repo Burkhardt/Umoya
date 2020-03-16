@@ -26,7 +26,7 @@ namespace Repo.Clients.CLI
             string extension = string.Empty;
             try
             {
-                if(fileName.Contains('.'))
+                if (fileName.Contains('.'))
                 {
                     string[] splitByDot = fileName.Split('.');
                     extension = splitByDot[splitByDot.Length - 1];
@@ -34,10 +34,10 @@ namespace Repo.Clients.CLI
                     {
                         throw new Exceptions.ResourceTypeException();
                     }
-                    extension =  extension.Trim().ToLower();
+                    extension = extension.Trim().ToLower();
                 }
             }
-            catch(Exception x)
+            catch (Exception x)
             {
                 Logger.Do("GetLowerCaseFileExtension Error " + x.StackTrace);
             }
@@ -104,7 +104,7 @@ namespace Repo.Clients.CLI
                 else if (IsCodeFileName(Extension)) OutType = ResourceType.Code;
                 else if (IsDataFileName(Extension)) OutType = ResourceType.Data;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Do("Error GetResourceType " + e.StackTrace);
             }
@@ -162,7 +162,7 @@ namespace Repo.Clients.CLI
 
         public static async Task<Dictionary<ResourceType, Dictionary<string, ResourceIdentifier>>> GetListOfResourcesAdded(string ResourceProjectPath)
         {
-            bool FromRepo=false;
+            bool FromRepo = false;
             Dictionary<ResourceType, Dictionary<string, ResourceIdentifier>> ListOfResourceLocallyAdded = new Dictionary<ResourceType, Dictionary<string, ResourceIdentifier>>();
             Dictionary<string, ResourceIdentifier> TempListOfResourceLocallyAdded = new Dictionary<string, ResourceIdentifier>();
             List<ResourceIdentifier> TempListOfDependentResourcesAdded = new List<ResourceIdentifier>();
@@ -188,7 +188,7 @@ namespace Repo.Clients.CLI
                 string ResourceAuthors = ResourceSpecDoc.DocumentElement.GetElementsByTagName("authors")[0].InnerText;
                 RId.Description = ResourceDescription;
                 RId.Authors = ResourceAuthors;
-                if(!FromRepo) RId.Size = Resources.GetResourceSize(RId.TypeOfResource, RId.ResourceName);
+                if (!FromRepo) RId.Size = Resources.GetResourceSize(RId.TypeOfResource, RId.ResourceName);
                 if (!ListOfResourceLocallyAdded[RType].ContainsKey(ResourceName)) ListOfResourceLocallyAdded[RType][ResourceName] = RId;
                 TempListOfDependentResourcesAdded = await GetDependentResources(ResourceName, ResourceVersion, RType, ResourceSpecDoc);
                 UpdateDependentResourcesAdded(ref ListOfResourceLocallyAdded, TempListOfDependentResourcesAdded);
@@ -211,14 +211,14 @@ namespace Repo.Clients.CLI
             else return "Other";
         }
 
-        public static async Task<List<ResourceIdentifier>> GetDependentResources(ResourceIdentifier ResourceId, bool FromRepo=false)
+        public static async Task<List<ResourceIdentifier>> GetDependentResources(ResourceIdentifier ResourceId, bool FromRepo = false)
         {
             return await GetDependentResources(ResourceId.ResourceName, ResourceId.Version, ResourceId.TypeOfResource, await GetResourceSpec(ResourceId, FromRepo), FromRepo);
         }
 
-        public static async Task<List<ResourceIdentifier>> GetDependentResources(string ResourceName, string ResourceVersion, Resources.ResourceType ResourceType, XmlDocument ResourceSpecDoc, bool FromRepo=false)
+        public static async Task<List<ResourceIdentifier>> GetDependentResources(string ResourceName, string ResourceVersion, Resources.ResourceType ResourceType, XmlDocument ResourceSpecDoc, bool FromRepo = false)
         {
-            Logger.Do("GetDependentResources Started for resource name "  + ResourceName  +  " version " + ResourceVersion  + " Type " + ResourceType + " FromRepo " + FromRepo);
+            Logger.Do("GetDependentResources Started for resource name " + ResourceName + " version " + ResourceVersion + " Type " + ResourceType + " FromRepo " + FromRepo);
             List<ResourceIdentifier> Out = new List<ResourceIdentifier>();
             try
             {
@@ -229,14 +229,14 @@ namespace Repo.Clients.CLI
                     {
                         Logger.Do("DependentResource " + DependentResourceName);
                         XmlDocument DependentResourceSpecDoc;
-                        ResourceIdentifier DependentResourceIdentifier = ResourceIdentifier.Empty;  
+                        ResourceIdentifier DependentResourceIdentifier = ResourceIdentifier.Empty;
                         DependentResourceIdentifier.ResourceName = DependentResourceName;
-                        DependentResourceIdentifier.Version = ListOfDependencies[DependentResourceName].ToString();                                         
+                        DependentResourceIdentifier.Version = ListOfDependencies[DependentResourceName].ToString();
                         DependentResourceIdentifier.TypeOfResource = GetResourceType(DependentResourceName);
-                        DependentResourceSpecDoc = await GetResourceSpec(DependentResourceIdentifier, FromRepo);                        
+                        DependentResourceSpecDoc = await GetResourceSpec(DependentResourceIdentifier, FromRepo);
                         DependentResourceIdentifier.Description = DependentResourceSpecDoc.DocumentElement.GetElementsByTagName("description")[0].InnerText;
                         DependentResourceIdentifier.Authors = DependentResourceSpecDoc.DocumentElement.GetElementsByTagName("authors")[0].InnerText;
-                        if(!FromRepo) DependentResourceIdentifier.Size = GetResourceSize(DependentResourceIdentifier.TypeOfResource, DependentResourceIdentifier.ResourceName);
+                        if (!FromRepo) DependentResourceIdentifier.Size = GetResourceSize(DependentResourceIdentifier.TypeOfResource, DependentResourceIdentifier.ResourceName);
                         Out.Add(DependentResourceIdentifier);
                         Out.AddRange(await GetDependentResources(DependentResourceIdentifier, FromRepo));
                     }
@@ -246,16 +246,16 @@ namespace Repo.Clients.CLI
             catch (Exception ex)
             {
                 Logger.Do(ex.StackTrace);
-            }            
+            }
             return Out;
         }
 
 
-        public static async Task<XmlDocument> GetResourceSpec(ResourceIdentifier ResourceId, bool FromRepo=false)
+        public static async Task<XmlDocument> GetResourceSpec(ResourceIdentifier ResourceId, bool FromRepo = false)
         {
             Logger.Do("GetResourceSpec " + ResourceId.ResourceName + " FromRepo " + FromRepo.ToString());
             XmlDocument ResourceSpec = new XmlDocument();
-            if(FromRepo)
+            if (FromRepo)
             {
                 string ResourceSpecEndPoint = GetResourceSpecURLByNameAndVersionFromRepo(ResourceId.ResourceName, ResourceId.Version);
                 ResourceSpec.Load(ResourceSpecEndPoint);
@@ -267,9 +267,9 @@ namespace Repo.Clients.CLI
                 {
                     ResourceSpecFile = Constants.ResourceDirecotryDefaultPath + Constants.PathSeperator + "resources" + Constants.PathSeperator + ResourceId.ResourceName.ToLower() + Constants.PathSeperator + ResourceId.Version + Constants.PathSeperator + ResourceId.ResourceName.ToLower() + ".nuspec";
                     if (!File.Exists(ResourceSpecFile)) throw new Exception("Resource Spec " + ResourceSpecFile + " is not found");
-                }                
+                }
                 ResourceSpec.Load(ResourceSpecFile);
-            }            
+            }
             return ResourceSpec;
         }
 
@@ -299,11 +299,11 @@ namespace Repo.Clients.CLI
             return ListOfDependencies;
         }
 
-        public static async Task<bool> IsResourcePresentInRepoAsync(ResourceIdentifier ResourceId, bool CacheStrategy=false)
+        public static async Task<bool> IsResourcePresentInRepoAsync(ResourceIdentifier ResourceId, bool CacheStrategy = false)
         {
             string RequestedUrl = string.Empty;
             bool Status = false;
-            if(CacheStrategy)
+            if (CacheStrategy)
             {
                 //Need to check resource and its dependent resource(s) are present in cache
                 return true;
@@ -384,7 +384,7 @@ namespace Repo.Clients.CLI
                 foreach (string ResourceName in Temp.Keys)
                 {
                     TempResourceIdentifier = Temp[ResourceName];
-                    if(TempResourceIdentifier.ExistsLocally) ZMODResources[TypeOfResource][ResourceName] = TempResourceIdentifier;
+                    if (TempResourceIdentifier.ExistsLocally) ZMODResources[TypeOfResource][ResourceName] = TempResourceIdentifier;
                 }
             }
         }
@@ -407,7 +407,7 @@ namespace Repo.Clients.CLI
 
         public static string GetRepoSearchURLByQuery(string QueryString)
         {
-            return RestOps.AppendQueryInEndPoint(GetRepoSearchURL(), "q" , QueryString);
+            return RestOps.AppendQueryInEndPoint(GetRepoSearchURL(), "q", QueryString);
         }
 
         public static string GetResourceSize(ResourceType TypeOfResource, string ResourceName)
@@ -444,14 +444,12 @@ namespace Repo.Clients.CLI
             }
             return Status;
         }
-        public static bool GenerateOutputJSONFile(List<Package> RepoItems, List<ResourceIdentifier> LocalItems, string From, string FileName)
+        public static bool GenerateOutputJSONFile(List<Package> RepoItems, List<ResourceIdentifier> LocalItems,
+         string From, string FileName, string actionName, string otherInput)
         {
             try
             {
                 bool Status = true;
-                //  System.Console.WriteLine(Path.GetDirectoryName(Path.GetFullPath(FileName)));
-               // currentPath = Directory.GetParent(currentPath).FullName;
-                //System.Console.WriteLine(Path.GetDirectoryName(currentPath));
                 if (Directory.Exists(Path.GetDirectoryName(Path.GetFullPath(FileName))))
                 {
                     if (File.Exists(FileName))
@@ -460,16 +458,22 @@ namespace Repo.Clients.CLI
                     {
                         tw.Close();
                     }
+                   
+                    RootJsonOutput rootJsonOutputFile = new RootJsonOutput();
+                    rootJsonOutputFile.action = actionName;
+                    rootJsonOutputFile.input = otherInput;
+
                     if (From.ToLower() == "repo")
                     {
-                        var json = JsonConvert.SerializeObject(RepoItems);
-                        File.WriteAllText(FileName, json);
+                        rootJsonOutputFile.RepoItems = RepoItems;
                     }
                     else
                     {
-                        var json = JsonConvert.SerializeObject(LocalItems);
-                        File.WriteAllText(FileName, json);
+                        rootJsonOutputFile.LocalItems = LocalItems;
                     }
+                    var json = JsonConvert.SerializeObject(rootJsonOutputFile);
+                  //  System.Console.WriteLine(json);
+                    File.WriteAllText(FileName, json);
                 }
                 else
                 {
@@ -496,10 +500,10 @@ namespace Repo.Clients.CLI
             return Out;
         }
 
-        public static async Task<ResourceIdentifier> GetResourceInfoByNameAndVersionFromRepo(string ResourceName,string ResourceVersion)
+        public static async Task<ResourceIdentifier> GetResourceInfoByNameAndVersionFromRepo(string ResourceName, string ResourceVersion)
         {
             Logger.Do("GetResourceInfoByNameAndVersionFromRepo started , Resource Name " + ResourceName + " Version " + ResourceVersion);
-            ResourceIdentifier ResourceId = ResourceIdentifier.Empty; 
+            ResourceIdentifier ResourceId = ResourceIdentifier.Empty;
             ResourceId.ResourceName = ResourceName;
             ResourceId.Version = ResourceVersion;
             ResourceId.TypeOfResource = GetResourceType(ResourceName);
@@ -508,7 +512,7 @@ namespace Repo.Clients.CLI
             ResourceId.Authors = ResourceSpecDoc.DocumentElement.GetElementsByTagName("authors")[0].InnerText;
             List<ResourceIdentifier> ListOfDependencies = new List<ResourceIdentifier>();
             ListOfDependencies = await GetDependentResources(ResourceId, true);
-            foreach(ResourceIdentifier Temp in ListOfDependencies)
+            foreach (ResourceIdentifier Temp in ListOfDependencies)
             {
                 ResourceId.Dependencies[Temp.ResourceName] = Temp;
             }
@@ -524,7 +528,7 @@ namespace Repo.Clients.CLI
             if (ResponseFromRepo.IsSuccessStatusCode)
             {
                 var SearchResultSetInListOfResources = await ResponseFromRepo.Content.ReadAsAsync<ListResponse>();
-                List<Package> ListOfResources;                    
+                List<Package> ListOfResources;
                 ListOfResources = SearchResultSetInListOfResources.Data.ToList();
                 Package FirstResouce = ListOfResources.FirstOrDefault();
                 ResourceId.ResourceName = FirstResouce.Id;
@@ -534,7 +538,7 @@ namespace Repo.Clients.CLI
                 ResourceId.Version = FirstResouce.Version;
                 List<ResourceIdentifier> ListOfDependencies = new List<ResourceIdentifier>();
                 ListOfDependencies = await GetDependentResources(ResourceId, true);
-                foreach(ResourceIdentifier Temp in ListOfDependencies) ResourceId.Dependencies[Temp.ResourceName] = Temp;
+                foreach (ResourceIdentifier Temp in ListOfDependencies) ResourceId.Dependencies[Temp.ResourceName] = Temp;
             }
             Logger.Do("GetLatestResourceInfoByNameFromRepo out " + ResourceId.ToString());
             return ResourceId;
@@ -549,20 +553,20 @@ namespace Repo.Clients.CLI
         {
             string ResourceResourcePath = GetResourcePackageURLByNameAndVersionFromRepo(ResourceId.ResourceName, ResourceId.Version);
             string ResourceResourceFileName = GetResourceCompressFileName(ResourceId);
-            if(!Directory.Exists(DownloadFolderPath)) Directory.CreateDirectory(DownloadFolderPath);
+            if (!Directory.Exists(DownloadFolderPath)) Directory.CreateDirectory(DownloadFolderPath);
             string TempDestinationFile = DownloadFolderPath + Constants.PathSeperator + ResourceResourceFileName;
             Downloader ResourceDownloaderInstance = null;
-            if(!File.Exists(TempDestinationFile)) 
+            if (!File.Exists(TempDestinationFile))
             {
                 ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile, Info.Instance.ShowProgress);
                 WaitForDownloadCompletion(ref ResourceDownloaderInstance);
             }
-            foreach(KeyValuePair<string, ResourceIdentifier> KeyPair in ResourceId.Dependencies)
+            foreach (KeyValuePair<string, ResourceIdentifier> KeyPair in ResourceId.Dependencies)
             {
                 ResourceResourcePath = GetResourcePackageURLByNameAndVersionFromRepo(KeyPair.Value.ResourceName, KeyPair.Value.Version);
                 ResourceResourceFileName = GetResourceCompressFileName(KeyPair.Value);
                 TempDestinationFile = DownloadFolderPath + Constants.PathSeperator + ResourceResourceFileName;
-                if(!File.Exists(TempDestinationFile))
+                if (!File.Exists(TempDestinationFile))
                 {
                     ResourceDownloaderInstance = new Downloader(ResourceResourcePath, TempDestinationFile, Info.Instance.ShowProgress);
                     WaitForDownloadCompletion(ref ResourceDownloaderInstance);
@@ -573,8 +577,8 @@ namespace Repo.Clients.CLI
         public static void WaitForDownloadCompletion(ref Downloader DownloaderInstance)
         {
             for (; ; )
-            {                
-                System.Threading.Thread.Sleep(100);                
+            {
+                System.Threading.Thread.Sleep(100);
                 DownloaderInstance.PrintProgressInfo();
                 if (DownloaderInstance.Status || PSOps.UserRequestToStop)
                 {
@@ -582,14 +586,14 @@ namespace Repo.Clients.CLI
                     break;
                 }
             }
-            if(PSOps.UserRequestToStop) 
+            if (PSOps.UserRequestToStop)
             {
-                DownloaderInstance.Cancel();                    
-                if(File.Exists(DownloaderInstance.DownloadFilePath))
+                DownloaderInstance.Cancel();
+                if (File.Exists(DownloaderInstance.DownloadFilePath))
                 {
                     LogCacheCleanUpOffCycle(DownloaderInstance.DownloadFilePath);
-                }                    
-                throw new Exception("User has stopped while downloading resource : " + DownloaderInstance.DownloadFileName);                    
+                }
+                throw new Exception("User has stopped while downloading resource : " + DownloaderInstance.DownloadFileName);
             }
         }
 
@@ -607,18 +611,18 @@ namespace Repo.Clients.CLI
         {
             try
             {
-                if(File.Exists(Constants.DefaultResourceCacheCleanupToDoFile))
+                if (File.Exists(Constants.DefaultResourceCacheCleanupToDoFile))
                 {
                     File.Delete(File.ReadAllText(Constants.DefaultResourceCacheCleanupToDoFile));
                     File.Delete(Constants.DefaultResourceCacheCleanupToDoFile);
                 }
             }
-            catch(Exception ex){Logger.Do("DoCacheCleanUpIfNeeded " + ex.StackTrace);}
+            catch (Exception ex) { Logger.Do("DoCacheCleanUpIfNeeded " + ex.StackTrace); }
         }
 
         public static string GetResourceChecksum(string ResourceFilePath)
         {
-            FileStream  fileStream = new FileStream(ResourceFilePath, FileMode.OpenOrCreate, FileAccess.Read);
+            FileStream fileStream = new FileStream(ResourceFilePath, FileMode.OpenOrCreate, FileAccess.Read);
             using (var bufferedStream = new BufferedStream(fileStream, 1024 * 32))
             {
                 var sha = new SHA512Managed();
@@ -627,23 +631,23 @@ namespace Repo.Clients.CLI
             }
         }
 
-        public static void DoCompress(string FolderToCompress, string CompressFile, List<string> ListOfEntriesToIgnoure )
+        public static void DoCompress(string FolderToCompress, string CompressFile, List<string> ListOfEntriesToIgnoure)
         {
-            ZipFile.CreateFromDirectory(FolderToCompress, CompressFile);               
+            ZipFile.CreateFromDirectory(FolderToCompress, CompressFile);
             using (FileStream zipToOpen = new FileStream(CompressFile, FileMode.Open))
             {
                 List<string> ListOfEntriesToDelete = new List<string>();
                 using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                 {
-                    for(int i=0; i< archive.Entries.Count; i++)
-                    {                            
-                        if(NeedToIgnoreEntryToCompress(archive.Entries[i].FullName, ListOfEntriesToIgnoure))
-                        {                                
-                            ListOfEntriesToDelete.Add(archive.Entries[i].FullName);  
-                        }     
-                        else Logger.Do(archive.Entries[i].FullName);                    
-                    }   
-                    for(int i=0;i<ListOfEntriesToDelete.Count;i++)
+                    for (int i = 0; i < archive.Entries.Count; i++)
+                    {
+                        if (NeedToIgnoreEntryToCompress(archive.Entries[i].FullName, ListOfEntriesToIgnoure))
+                        {
+                            ListOfEntriesToDelete.Add(archive.Entries[i].FullName);
+                        }
+                        else Logger.Do(archive.Entries[i].FullName);
+                    }
+                    for (int i = 0; i < ListOfEntriesToDelete.Count; i++)
                     {
                         ZipArchiveEntry entry = archive.GetEntry(ListOfEntriesToDelete[i]);
                         if (entry != null)
@@ -651,17 +655,17 @@ namespace Repo.Clients.CLI
                             Logger.Do("Deleting " + entry.FullName);
                             entry.Delete();
                         }
-                    }                                         
+                    }
                 }
-                
-            }   
+
+            }
         }
 
         private static bool NeedToIgnoreEntryToCompress(string EntryName, List<string> ListOfEntriesToIgnoure)
         {
-            for(int i=0;i<ListOfEntriesToIgnoure.Count;i++)
+            for (int i = 0; i < ListOfEntriesToIgnoure.Count; i++)
             {
-                if(EntryName.Contains(ListOfEntriesToIgnoure[i])) return true;
+                if (EntryName.Contains(ListOfEntriesToIgnoure[i])) return true;
             }
             return false;
         }
