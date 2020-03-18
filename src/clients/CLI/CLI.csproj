@@ -22,7 +22,7 @@
 
 
  <ItemGroup>
-    <PackageReference Include="LibGit2Sharp" Version="0.26.1" />
+ <EmbeddedResource Include="EmbeddedResources\umoya-resources.zip" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />

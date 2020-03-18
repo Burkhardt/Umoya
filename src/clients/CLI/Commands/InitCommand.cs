@@ -3,7 +3,6 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using LibGit2Sharp;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace Repo.Clients.CLI.Commands
@@ -56,10 +55,15 @@ namespace Repo.Clients.CLI.Commands
                         {
                             Directory.Delete(UmoyaHome, true);
                             Directory.CreateDirectory(UmoyaHome);
-                            Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                            Repository.Setup(UmoyaHome);
+                            //Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
                         }
                     }
-                    else Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                    else
+                    {
+                        Repository.Setup(UmoyaHome);
+                    } 
+                    //Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
                     if(!Directory.Exists(Constants.ResourcePackDirecotryDefaultPath + Constants.PathSeperator + "contentFiles")) 
                     {
                         Directory.CreateDirectory(Constants.ResourcePackDirecotryDefaultPath + Constants.PathSeperator + "contentFiles");
@@ -78,14 +82,14 @@ namespace Repo.Clients.CLI.Commands
                 {
                     if (ForceToOverWrite)
                     {
-                        using (var repo = new Repository(UmoyaHome))
+                       /*  using (var repo = new Repository(UmoyaHome))
                         {
                             LibGit2Sharp.PullOptions options = new LibGit2Sharp.PullOptions();
                             options.FetchOptions = new FetchOptions();
                             var signature = new LibGit2Sharp.Signature(new Identity("MERGE_USER_NAME", "MERGE_USER_EMAIL"), DateTimeOffset.Now);
                             Logger.Do("Updating umoya configurations/template from github " + GitHubResourceRepoURL);
                             LibGit2Sharp.Commands.Pull(repo, signature, options);
-                        }
+                        } */
                         if (Info.UpdateFileForInit(UmoyaHome, ZmodHome, Owner)) Console.LogWarning("Configurations are updated.");
                         else Console.LogError("Error while updating configurations");
                     }                    

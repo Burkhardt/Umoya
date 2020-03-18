@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using LibGit2Sharp;
 using McMaster.Extensions.CommandLineUtils;
 using System.Configuration;
 using System.Collections.Generic;
@@ -79,10 +78,12 @@ namespace Repo.Clients.CLI.Commands
                             {
                                 Directory.Delete(UmoyaHome, true);
                                 Directory.CreateDirectory(UmoyaHome);
-                                Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                              //  Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                              Repository.Setup(UmoyaHome);
                             }
                         }
-                        else Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                        else //Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                        Repository.Setup(UmoyaHome);
                         //ToDo Surbhi Create config file from FSOps
                         if (Info.CreateFile(UmoyaHome, ZMODHome, Owner, null, null))
                         {
