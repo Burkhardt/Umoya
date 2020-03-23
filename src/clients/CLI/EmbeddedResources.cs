@@ -9,7 +9,6 @@ namespace Repo.Clients.CLI.Commands
         public static void Extract(string outDirectory,  string resourceName)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string ns = typeof(EmbeddedResources).Namespace;
             var resNames =assembly.GetManifestResourceNames();
             using (Stream s = assembly.GetManifestResourceStream(resNames.ToList()[0]))
             {
@@ -19,7 +18,5 @@ namespace Repo.Clients.CLI.Commands
                     w.Write(r.ReadBytes((int)s.Length));
             }
         }
-
-
     }
 }

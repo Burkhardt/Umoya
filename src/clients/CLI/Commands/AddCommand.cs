@@ -78,11 +78,10 @@ namespace Repo.Clients.CLI.Commands
                             {
                                 Directory.Delete(UmoyaHome, true);
                                 Directory.CreateDirectory(UmoyaHome);
-                              //  Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
                               Repository.Setup(UmoyaHome);
                             }
                         }
-                        else //Repository.Clone(GitHubResourceRepoURL, UmoyaHome);
+                        else 
                         Repository.Setup(UmoyaHome);
                         //ToDo Surbhi Create config file from FSOps
                         if (Info.CreateFile(UmoyaHome, ZMODHome, Owner, null, null))
@@ -171,7 +170,6 @@ namespace Repo.Clients.CLI.Commands
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }
             catch (Exceptions.ResourceInfoInvalidFormatException etr) { Logger.Do(etr.Message); }
             catch (Exception ex) { Console.LogError(ex.Message); }
-           // Console.Close();
         }
 
         private bool IsResourceVersionGiven(string ResourceVersion)

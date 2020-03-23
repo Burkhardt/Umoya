@@ -11,7 +11,7 @@ namespace Repo.Clients.CLI
     class Program
     {
 
-public static string[] allAgrs = {};
+        public static string[] allAgrs = { };
         static int Main(string[] args)
         {
             int commandResult = 0;
@@ -33,8 +33,6 @@ public static string[] allAgrs = {};
             string CommandName = args[0].ToLower();
             string[] newArgs = args.Skip(1).ToArray();
             allAgrs = args;
-            // foreach(var i in args)
-            //System.Console.WriteLine(i);
             //if --json is present
             string NextOf = string.Empty;
             if (newArgs.ToList().Contains("-j") || newArgs.ToList().Contains("--json"))
