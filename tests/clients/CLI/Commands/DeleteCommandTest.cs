@@ -35,7 +35,7 @@ namespace Repo.Clients.CLI.Commands.Tests
 
         #region Umoya delete local resource which was added before.
         #endregion
-        //[Fact]
+        [Fact]
         public void ResourceDeletedInLocalTest()
         {
             #region Setup
@@ -68,8 +68,9 @@ namespace Repo.Clients.CLI.Commands.Tests
             string ResourceExpectedPath = ZMODPath + Constants.PathSeperator + Constants.ModelDirName + Constants.PathSeperator + ResourceToDelete;
             Assert.True(!File.Exists(ResourceExpectedPath), "Model Resource is not found in ZMOD after the  ADD command is run.");
             #endregion
+            TestAPIs.StopRepo();
             #region Clean up
-            FSOps.DeleteDirectory(ZMODPath);
+            FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
             #endregion
         }
     }

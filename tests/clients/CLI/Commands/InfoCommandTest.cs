@@ -37,7 +37,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         // 2. Capture the Expected Output
         #endregion
 
-        //[Fact]
+        [Fact]
         public void WithDefaultConfigurationsPresentInfoTest()
         {
             #region Setup
@@ -77,7 +77,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             #endregion
 TestAPIs.StopRepo();
             #region Clean up
-            FSOps.DeleteDirectory(ZMODPath);
+            FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
             #endregion
             #region Stop Server
             //TestAPIs.StopRepo();
