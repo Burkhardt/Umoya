@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.IO.Compression;
+using System.Reflection;
 
 namespace Repo.Clients.CLI.Commands.Tests
 {
@@ -31,15 +32,19 @@ namespace Repo.Clients.CLI.Commands.Tests
             process.StartInfo.FileName = DotNetCommand;
             process.StartInfo.Arguments = UmoyaPath + " " + ActionName + " " + ParamString;
             process.StartInfo.UseShellExecute = false;
+
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.WorkingDirectory = WorkingDir;
             process.Start();
-            process.WaitForExit();
             if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(ActualoutputFilePath, process.StandardOutput.ReadToEnd());
 
-        }
 
+            process.WaitForExit();
+            // string output = process.StandardOutput.ReadToEnd();
+            //process.WaitForExit(10);
+
+        }
         public static bool CompareActualAndExpectedOutput(string TestName, string TestScenariosName, out string DiffOutput)
         {
             bool Status = true;
@@ -58,10 +63,10 @@ namespace Repo.Clients.CLI.Commands.Tests
            .Replace('\n', ' ').Replace('\t', ' ').Replace('\r', ' ').Replace("  ", string.Empty).Replace("   ", string.Empty)
            .Replace(" ", string.Empty);
 
-            var DifferenceBetweenExpectedAndActualOutput = string.Compare(ActualContents, ExpectedContents);
+            var DifferenceBetweenExpectedAndActualOutput = string.Equals(ActualContents, ExpectedContents);
             System.Console.WriteLine("ActualContents " + ActualContents);
             System.Console.WriteLine("ExpectedContents " + ExpectedContents);
-            if (DifferenceBetweenExpectedAndActualOutput > 0)
+            if (!DifferenceBetweenExpectedAndActualOutput)
             {
                 Status = false;
                 DiffOutput = string.Join(',', DifferenceBetweenExpectedAndActualOutput);
@@ -95,7 +100,8 @@ namespace Repo.Clients.CLI.Commands.Tests
                     Directory.Delete(Constants.DefaultTestDataDir, true);
                 }
                 Directory.CreateDirectory(Constants.DefaultTestDataDir);
-                CloneGitRepository(Environment.CurrentDirectory, TestDataGitHubRepoURL);
+                //CloneGitRepository(Environment.CurrentDirectory, TestDataGitHubRepoURL);
+                CloneGitRepository(Environment.CurrentDirectory+Constants.PathSeperator+ "umoya-testdata");
                 string ZMODPath = Constants.DefaultTestDataDir + Constants.PathSeperator + "temp";
                 Directory.CreateDirectory(ZMODPath);
                 IsInitialized = true;
@@ -112,7 +118,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             bool Status = true;
             CaptureConsoleOutPut("init", string.Empty, ZMODPath, string.Empty);
-            CaptureConsoleOutPut("info", "-d False", ZMODPath, string.Empty);
+            CaptureConsoleOutPut("info", "-sp False", ZMODPath, string.Empty);
             return Status;
         }
 
@@ -146,20 +152,15 @@ namespace Repo.Clients.CLI.Commands.Tests
         }
 
 
-        public static bool CloneGitRepository(string DirectoryPathToClone, string GitRepositoryPath)
+        public static bool CloneGitRepository(string DirectoryPathToClone)
         {
             try
             {
-                System.Console.WriteLine("DirectoryPathToClone: " + DirectoryPathToClone);
-                System.Console.WriteLine("GitRepositoryPath: " + GitRepositoryPath);
-                Process TempProcess = new Process();
-                TempProcess.StartInfo.FileName = "git";
-                TempProcess.StartInfo.Arguments = "clone " + GitRepositoryPath;
-                TempProcess.StartInfo.UseShellExecute = false;
-                TempProcess.StartInfo.CreateNoWindow = true;
-                TempProcess.StartInfo.WorkingDirectory = DirectoryPathToClone;
-                TempProcess.Start();
-                TempProcess.WaitForExit();
+                string ZipFileName = "umoya-testdata.zip";
+                string ZipFilePath = DirectoryPathToClone + Constants.PathSeperator + ZipFileName;
+                Extract(DirectoryPathToClone, ZipFileName);
+                ZipFile.ExtractToDirectory(ZipFilePath, DirectoryPathToClone);
+                File.Delete(ZipFilePath);
                 return true;
             }
             catch (Exception ex)
@@ -169,6 +170,18 @@ namespace Repo.Clients.CLI.Commands.Tests
             }
         }
 
+ public static void Extract(string outDirectory,  string resourceName)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            var resNames =assembly.GetManifestResourceNames();
+            using (Stream s = assembly.GetManifestResourceStream(resNames.ToList()[0]))
+            {
+                using (BinaryReader r = new BinaryReader(s))
+                using (FileStream fs = new FileStream(outDirectory + "\\" + resourceName, FileMode.OpenOrCreate))
+                using (BinaryWriter w = new BinaryWriter(fs))
+                    w.Write(r.ReadBytes((int)s.Length));
+            }
+        }
         public static bool StartRepo()
         {
             //Start Repo 
