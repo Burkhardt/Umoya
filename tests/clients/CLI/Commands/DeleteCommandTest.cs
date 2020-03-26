@@ -19,23 +19,27 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             // Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             #region Check and start the repo server, if not already started.
+             TestAPIs.StopRepo();
+            if (Directory.Exists(Constants.DefaultTestDataDir))
+                FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
             if (!TestAPIs.IsRepoRunning())
             {
                 //UnZip publish folder in umoya repo bin folder
                 Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
-                TestAPIs.StartRepo();
+              
             }
             #endregion
 
             Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             //Copy repo-resources from umoya-testdata to repo publish folder
             Assert.True(TestAPIs.SetUpRepoServer(), "Failed to setup resources and db for repo.");
+              TestAPIs.StartRepo();
         }
 
 
         #region Umoya delete local resource which was added before.
         #endregion
-        [Fact]
+        //[Fact]
         public void ResourceDeletedInLocalTest()
         {
             #region Setup
@@ -68,9 +72,9 @@ namespace Repo.Clients.CLI.Commands.Tests
             string ResourceExpectedPath = ZMODPath + Constants.PathSeperator + Constants.ModelDirName + Constants.PathSeperator + ResourceToDelete;
             Assert.True(!File.Exists(ResourceExpectedPath), "Model Resource is not found in ZMOD after the  ADD command is run.");
             #endregion
-            TestAPIs.StopRepo();
+            //TestAPIs.StopRepo();
             #region Clean up
-            FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
+            //FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
             #endregion
         }
     }

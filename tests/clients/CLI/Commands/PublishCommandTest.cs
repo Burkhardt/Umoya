@@ -13,23 +13,27 @@ namespace Repo.Clients.CLI.Commands.Tests
         {
             //Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             #region Check and start the repo server, if not already started.
+            TestAPIs.StopRepo();
+            if (Directory.Exists(Constants.DefaultTestDataDir))
+                FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
             if (!TestAPIs.IsRepoRunning())
             {
-                 //UnZip publish folder in umoya repo bin folder
+                //UnZip publish folder in umoya repo bin folder
                 Assert.True(TestAPIs.UnZipPublishFolder(), "Failed to exract publish folder to get binary file.");
-                Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
+
             }
             #endregion
 
             Assert.True(TestAPIs.InitializeTestDataSetup(), "Test data setup is not done successfully.");
             //Copy repo-resources from umoya-testdata to repo publish folder
             Assert.True(TestAPIs.SetUpRepoServer(), "Failed to setup resources and db for repo.");
+            Assert.True(TestAPIs.StartRepo(), "Repo server could not be started.");
         }
         #region Publish single resource withiout dependency
         //Baseline
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
-        //[Fact]
+      //  [Fact]
         public void ResourceWithoutDependency()
         {
             #region Setup
@@ -62,7 +66,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(File.ReadLines(ActualOutputFilePath).Any(line => line.Contains(Path.GetFileName(ResourceToPublish))));
             #endregion
             #region Clean up
-            FSOps.DeleteDirectory(ZMODPath);
+            //  FSOps.DeleteDirectory(ZMODPath);
             #endregion
         }
         #endregion
@@ -72,7 +76,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //1. Repo should not have HelloWorld.pmml@1.0.0
         //2. HelloWorld.pmml should be in local test-data folder
         //3. HelloWorldData.csv should be present in local test-data folder
-        //[Fact]
+      //  [Fact]
         public void ResourceWithDependency()
         {
             #region Setup
@@ -118,7 +122,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(File.ReadLines(ActualOutputFilePathForDependentResource).Any(line => line.Contains(Path.GetFileName(DependencyResource))));
             #endregion
             #region Clean up
-            FSOps.DeleteDirectory(ZMODPath);
+            //  FSOps.DeleteDirectory(ZMODPath);
             #endregion
         }
         #endregion
