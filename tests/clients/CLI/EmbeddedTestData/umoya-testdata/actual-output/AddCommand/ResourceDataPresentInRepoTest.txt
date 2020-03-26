@@ -1,0 +1,2 @@
+Resource is not found in Repo. Please, check resource name and version is present.
+UMOYA action is not performed successfully.

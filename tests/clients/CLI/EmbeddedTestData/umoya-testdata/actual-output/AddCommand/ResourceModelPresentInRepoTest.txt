@@ -1,0 +1,3 @@
+> Resource is downloaded.
+> Resource (and its dependencies) are resolved and added into ZMOD.
+> UMOYA action <add> successfully performed.

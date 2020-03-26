@@ -1,0 +1,3 @@
+ZMOD is initializing..
+Configurations are created.
+ZMOD initialized successfully.

@@ -1,0 +1,6 @@
+> Checking resource in Repo.
+> Started downloading resource from Repo.
+> Resource is downloaded.
+> Resource (and its dependencies) are resolved and added into ZMOD.
+> Cleared resource cache.
+> UMOYA action <add> successfully performed.

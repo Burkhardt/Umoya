@@ -1,0 +1,10 @@
+
+Class   Name of Resource       Description         Authors   Version   Size
+______________________________________________________________________________
+Model   HelloWorld.pmml        Hello World Model   Rainer    1.0.0     0 B
+------------------------------------------------------------------------------
+Data    HelloWorldData.csv     Hello World Data    Rainer    1.0.0     22 B
+------------------------------------------------------------------------------
+Code    HelloWorldCode.ipynb   Hello World Code    Rainer    1.0.0     4.15 KB
+
+1 - 3 of 3 results

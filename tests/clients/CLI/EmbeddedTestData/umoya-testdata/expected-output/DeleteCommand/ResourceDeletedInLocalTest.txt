@@ -1,0 +1,4 @@
+> Checking resource in ZMOD (local).
+> Getting resource (and its dependencies) in ZMOD.
+> Deleting resource.
+> UMOYA action <delete> successfully performed.
