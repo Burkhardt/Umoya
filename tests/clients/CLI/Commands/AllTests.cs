@@ -35,6 +35,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             //Copy repo-resources from umoya-testdata to repo publish folder
             Assert.True(TestAPIs.SetUpRepoServer(), "Failed to setup resources and db for repo.");
             TestAPIs.StartRepo();
+            #endregion
         }
         [Fact, Order(5)]
         [Trait("Category", "UmoyaTestCase")]
