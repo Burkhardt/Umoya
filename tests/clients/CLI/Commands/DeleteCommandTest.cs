@@ -39,7 +39,7 @@ namespace Repo.Clients.CLI.Commands.Tests
 
         #region Umoya delete local resource which was added before.
         #endregion
-        //[Fact]
+     //   [Fact]
         public void ResourceDeletedInLocalTest()
         {
             #region Setup
