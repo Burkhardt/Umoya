@@ -43,42 +43,31 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Zmod is not configured..
         //capture the output to run the command  umoya init 
         // To initialize ZMOD here, Use command : umoya init
-        //[Fact, Order(2)]
-        //[Trait("Category", "UmoyaTestCase")]
+        [Fact, Order(2)]
+        [Trait("Category", "UmoyaTestCase")]
         public void WithBlankFolderTest()
         {
             string TestName = "InitCommand";
-            #region SetUp
+             #region Setup
             string TestScenariosName = "WithBlankFolderTest";
+            //Need to do Umoya Repo Baseline setup
             string ZMODPath = Constants.DefaultTestDataDir + Constants.PathSeperator + "temp" + Constants.PathSeperator + Guid.NewGuid();
             Directory.CreateDirectory(ZMODPath);
             Assert.True(TestAPIs.InitZMOD(ZMODPath), "ZMOD init failed.");
             #endregion
-
-            #region Capturing Expected output
-            string ExpectedOutputFilePath = Constants.DefaultTestDataDir + Constants.PathSeperator + "expected-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt";
-            string ExpectedContents = File.ReadAllText(ExpectedOutputFilePath);
-            File.WriteAllText(ExpectedOutputFilePath, ExpectedContents);
+            #region Run command and capture output
+            TestAPIs.CaptureConsoleOutPut("init", "", ZMODPath, Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt");
             #endregion
-
-            #region Capturing Expected output
-            string ActualContentFilePath = Constants.DefaultTestDataDir + Constants.PathSeperator + "actual-output" + Constants.PathSeperator + TestName + Constants.PathSeperator + TestScenariosName + ".txt";
-            string ActualContents = File.ReadAllText(ActualContentFilePath);
-            TestAPIs.CaptureConsoleOutPut("init", string.Empty, ZMODPath, ActualContentFilePath);
-            File.WriteAllText(ActualContentFilePath, ActualContents);
-            #endregion
-
-            #region Check difference between expected and actual output
+            #region Compare outpt with baseline output
             string OutputDiff = string.Empty;
             Assert.True(TestAPIs.CompareActualAndExpectedOutput(TestName, TestScenariosName, out OutputDiff), "Action output is not matched with expected one. Diff : " + OutputDiff);
             #endregion
-            //TestAPIs.StopRepo();
-            #region Clean up
-            //FSOps.DeleteDirectory(ZMODPath);
-            #endregion
+            
         }
         #endregion
-        [Fact, Order(2)]
+       
+       
+        [Fact, Order(3)]
         [Trait("Category", "UmoyaTestCase")]
         public void WithDefaultConfigurationsPresentInfoTest()
         {
@@ -126,7 +115,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //3. Captured expected output.       
         // [Fact]
         #endregion
-        [Fact, Order(3)]
+        [Fact, Order(4)]
         [Trait("Category", "UmoyaTestCase")]
         public void ResourceModelPresentInRepoTest()
         {
@@ -153,7 +142,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             #endregion
         }
 
-        [Fact, Order(4)]
+        [Fact, Order(5)]
         [Trait("Category", "UmoyaTestCase")]
         public void ResourceCodePresentInRepoTest()
         {
@@ -174,7 +163,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             Assert.True(File.Exists(ResourceExpectedPath), "Code Resource is not found in ZMOD after the  ADD command is run.");
         }
 
-        [Fact, Order(5)]
+        [Fact, Order(6)]
         [Trait("Category", "UmoyaTestCase")]
         public void ResourceDataPresentInRepoTest()
         {
@@ -199,7 +188,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             #endregion
         }
 
-        [Fact, Order(6)]
+        [Fact, Order(7)]
         [Trait("Category", "UmoyaTestCase")]
         #region Umoya list local resources with already added resources (baseline)
         //Baseline    
@@ -257,7 +246,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         //Baseline    
         //1. Repo has HelloWorld.pmml@1.0.0, HelloWorldCode.ipynb@1.0.0 and HelloWorldData.csv@1.0.0
 
-        [Fact, Order(7)]
+        [Fact, Order(8)]
         [Trait("Category", "UmoyaTestCase")]
         public void RepoListWithBaselineResourcesTest()
         {
@@ -290,7 +279,7 @@ namespace Repo.Clients.CLI.Commands.Tests
         }
         #endregion
 
-        [Fact, Order(8)]
+        [Fact, Order(9)]
         [Trait("Category", "UmoyaTestCase")]
 
         #region Umoya delete local resource which was added before.
@@ -330,7 +319,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             #endregion
 
         }
-        [Fact, Order(9)]
+        [Fact, Order(10)]
         [Trait("Category", "UmoyaTestCase")]
         #region Publish single resource withiout dependency
         //Baseline
@@ -368,11 +357,11 @@ namespace Repo.Clients.CLI.Commands.Tests
              TestName + Constants.PathSeperator + TestScenariosName + ".List" + Path.GetFileName(ResourceToPublish) + ".txt";
             Assert.True(File.ReadLines(ActualOutputFilePath).Any(line => line.Contains(Path.GetFileName(ResourceToPublish))));
             #endregion
-            
+
         }
         #endregion
 
-        [Fact, Order(10)]
+        [Fact, Order(11)]
         [Trait("Category", "UmoyaTestCase")]
         #region Publish single resource with dependency
         //Baseline
@@ -429,12 +418,14 @@ namespace Repo.Clients.CLI.Commands.Tests
         }
         #endregion
 
-        [Fact, Order(11)]
+
+
+        [Fact, Order(12)]
         [Trait("Category", "UmoyaTestCase")]
         //CleanUp
         public void CleanUp()
         {
-            TestAPIs.StopRepo();
+            Assert.True(TestAPIs.StopRepo());
             FSOps.DeleteDirectory(Constants.DefaultTestDataDir);
         }
     }

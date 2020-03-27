@@ -38,12 +38,7 @@ namespace Repo.Clients.CLI.Commands.Tests
             process.StartInfo.WorkingDirectory = WorkingDir;
             process.Start();
             if (!ActualoutputFilePath.Equals(string.Empty)) File.WriteAllText(ActualoutputFilePath, process.StandardOutput.ReadToEnd());
-
-
             process.WaitForExit();
-            // string output = process.StandardOutput.ReadToEnd();
-            //process.WaitForExit(10);
-
         }
         public static bool CompareActualAndExpectedOutput(string TestName, string TestScenariosName, out string DiffOutput)
         {
