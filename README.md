@@ -1,6 +1,6 @@
 # Repo for AI Projects
 
-[![Build status](https://dev.azure.com/zementis-ai/Repo/_apis/build/status/Repo-CI)](https://dev.azure.com/zementis-ai/Repo/_build/latest?definitionId=4)
+[![Build status](https://dev.azure.com/zementis-ai/AI%20Projects/_apis/build/status/1.%20Repo%20(UMOYA)%20CI%20Pipeline)](https://dev.azure.com/zementis-ai/AI%20Projects/_build/latest?definitionId=4)
 
 The spirit of Machine Learning and Deep Learning.
 
