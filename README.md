@@ -54,7 +54,7 @@ Releases are automated from the master branch, executed by [DevOps pipeline](htt
 If you have an idea or found a bug, open an issue to discuss it.
 
 ## Credits to open source projects used as reference
-This project is inspired from couple of open source projects on nuget server. ZMOD Repo has many customize features for Software AG ZMOD, However It also has code/stacks from other open source projects of nuget servers, either as reference or actually porting pieces of code.
+This project is inspired from couple of open source projects on nuget server. ZMOD Repo has many customize features for Software AG MLW, However It also has code/stacks from other open source projects of nuget servers, either as reference or actually porting pieces of code.
 
 Credits:
  * [Official NuGet.Server](https://github.com/NuGet/NuGet.Server) under Apache License Version 2.0
