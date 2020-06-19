@@ -1,10 +1,10 @@
 # UMOYA CLI Cheatsheet
 
 ## Install
-        dotnet tool install -g umoya --add-source https://hub.umoya.ai/v3/index.json
+        dotnet tool install -g umoya --add-source https://repo.umoya.ai/v3/index.json
 
 ## Upgrade UMOYA CLI Tool
-        dotnet tool update -g umoya --add-source https://hub.umoya.ai/v3/index.json
+        dotnet tool update -g umoya --add-source https://repo.umoya.ai/v3/index.json
         
 ## Uninstall
         dotnet tool uninstall -g umoya
@@ -13,7 +13,7 @@
         umoya init
         
 ## Configure your UMOYA\Repo server 
-        umoya info --repo-url https://hub.umoya.ai/v3/index.json
+        umoya info --repo-url https://repo.umoya.ai/v3/index.json
         
 ## Publish resource with/without dependencies
         umoya publish "C:\temp\HelloWorld.pmml"@1.0.0 --description "Hello World Model" --tags MyModel,Testing
