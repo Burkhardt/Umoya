@@ -3,11 +3,11 @@
 ## Install
         dotnet tool install -g umoya --add-source https://hub.umoya.ai/v3/index.json
 
-## Uninstall
-        dotnet tool uninstall -g umoya
-        
 ## Upgrade UMOYA CLI Tool
         dotnet tool update -g umoya --add-source https://hub.umoya.ai/v3/index.json
+        
+## Uninstall
+        dotnet tool uninstall -g umoya
 
 ## Initialize your project directory
         umoya init
