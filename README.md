@@ -25,8 +25,8 @@ Versioning resource(like model, data and code) and manage its dependencies for a
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download)
 2. Download latest release from [here](https://github.com/nimeshgit/umoya/releases) and extract.
 3. Start the service with `dotnet Umoya.dll`
-4. Browse "http://localhost:8007/" in your browser.
-For more information, Please refer to [our documentation](https://zmod.org/).
+4. Browse "https://localhost:8007/" in your browser.
+For more information, Please refer to [our documentation](https://mlw.ai/).
 
 ## Development
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download) and [Node.js](https://nodejs.org/)
