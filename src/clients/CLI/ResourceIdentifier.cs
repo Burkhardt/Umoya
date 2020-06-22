@@ -95,5 +95,28 @@ namespace Repo.Clients.CLI
             }
         }
 
+        public bool IsZipResource
+        {
+            get
+            {
+                if (TypeOfResource.Equals(Resources.ResourceType.Data))
+                {
+                    if (ResourceName.IndexOf(".zip") == ResourceName.Length - 4) return true;
+                }
+                return false;
+            }
+        }
+
+        public string ZipResourceName
+        {
+            get
+            {
+                if (IsZipResource)
+                {
+                    return ResourceName.Substring(0, ResourceName.Length - 4);
+                }
+                return ResourceName;
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Repo.Clients.CLI.Commands
 {
@@ -44,7 +45,7 @@ namespace Repo.Clients.CLI.Commands
         private async Task OnExecuteAsync()
         {
             try
-            {            
+            {
                 string TempResourceName = string.Empty;
                 string GitHubResourceRepoURL = ConfigurationManager.AppSettings["GithubRepository"];
                 ResourceIdentifier ResourceId;
@@ -78,11 +79,10 @@ namespace Repo.Clients.CLI.Commands
                             {
                                 Directory.Delete(UmoyaHome, true);
                                 Directory.CreateDirectory(UmoyaHome);
-                              Repository.Setup(UmoyaHome);
+                                Repository.Setup(UmoyaHome);
                             }
                         }
-                        else 
-                        Repository.Setup(UmoyaHome);
+                        else Repository.Setup(UmoyaHome);
                         //ToDo Surbhi Create config file from FSOps
                         if (Info.CreateFile(UmoyaHome, ZMODHome, Owner, null, null))
                         {
@@ -177,7 +177,7 @@ namespace Repo.Clients.CLI.Commands
             bool Status = true;
             if (ResourceVersion.Equals("NoVersion")) Status = false;
             return Status;
-        }
+        }        
         private static string GetVersion()
                     => typeof(AddCommand).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
     }

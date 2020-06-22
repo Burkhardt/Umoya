@@ -4,6 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using static Repo.Clients.CLI.Resources;
 using System;
+using System.IO.Compression;
 
 namespace Repo.Clients.CLI
 {
@@ -284,10 +285,29 @@ namespace Repo.Clients.CLI
         {
             try
             {
-                string ResourcePath = Resources.ResourceDirPath(ResourceId.TypeOfResource) + Constants.PathSeperator + ResourceId.ResourceName;
-                Logger.Do("Deleting Resource " + ResourcePath);
-                if(ResourceId.TypeOfResource.Equals(ResourceType.Code)) Directory.Delete(ResourcePath, true);
-                else File.Delete(ResourcePath);
+                string ResourcePath = string.Empty;
+                if (ResourceId.IsZipResource)
+                {                    
+                    ResourcePath = Resources.ResourceDirPath(ResourceId.TypeOfResource) + Constants.PathSeperator + ResourceId.ZipResourceName;
+                    Logger.Do("Deleting Resource " + ResourcePath);
+                    System.IO.DirectoryInfo di = new DirectoryInfo(ResourcePath);
+                    foreach (FileInfo file in di.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (DirectoryInfo dir in di.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                    Directory.Delete(ResourcePath);
+                }
+                else
+                {
+                    ResourcePath = Resources.ResourceDirPath(ResourceId.TypeOfResource) + Constants.PathSeperator + ResourceId.ResourceName;
+                    Logger.Do("Deleting Resource " + ResourcePath);
+                    if (ResourceId.TypeOfResource.Equals(ResourceType.Code)) Directory.Delete(ResourcePath, true);
+                    else File.Delete(ResourcePath);
+                }
             }
             catch(Exception e)
             {
@@ -300,7 +320,7 @@ namespace Repo.Clients.CLI
             try
             {
                 Logger.Do(">> Resource : " + ResourceId.TypeOfResource.ToString() + " " + ResourceId.ResourceName + " " + ResourceId.Version);
-                string SourcePath = UmoyaResourcesHome + Constants.PathSeperator + ResourceId.ResourceName + Constants.PathSeperator + ResourceId.Version + Constants.PathSeperator + "contentFiles" + Constants.PathSeperator + ResourceId.TypeOfResource;
+                string SourcePath = UmoyaResourcesHome + Constants.PathSeperator + ResourceId.ResourceName.ToLower() + Constants.PathSeperator + ResourceId.Version + Constants.PathSeperator + "contentFiles" + Constants.PathSeperator + ResourceId.TypeOfResource;
                 string DestinationPath = Constants.ZmodDefaultHome + Constants.PathSeperator + Resources.GetZMODResourceType(ResourceId.TypeOfResource);
 
                 if (ResourceId.TypeOfResource.Equals(Resources.ResourceType.Code))
@@ -320,6 +340,22 @@ namespace Repo.Clients.CLI
                     SearchOption.AllDirectories))
                     File.Copy(newPath, newPath.Replace(SourcePath, DestinationPath), true);
 
+                //if data and .zip file then extract                
+                if (ResourceId.IsZipResource)
+                {                    
+                    if (ResourceId.ResourceName.IndexOf(".zip") == ResourceId.ResourceName.Length - 4)
+                    {
+                        Console.LogWriteLine("> Extracting Data (.zip) Resource");
+                        Logger.Do(">> Resource : " + ResourceId.TypeOfResource.ToString() + " " + ResourceId.ResourceName + " " + ResourceId.Version);
+                        string ResourceFilePath = DestinationPath + Constants.PathSeperator + ResourceId.ResourceName;
+                        ZipFile.ExtractToDirectory(ResourceFilePath, DestinationPath, true);
+                        if (!Directory.Exists(DestinationPath + Constants.PathSeperator + ResourceId.ZipResourceName))
+                        {
+                            throw new Exception("Not able to extract .zip file successfully");
+                        }
+                        File.Delete(ResourceFilePath);
+                    }
+                }
             }
             catch(Exception e)
             {

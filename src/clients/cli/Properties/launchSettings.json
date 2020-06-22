@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "delete DistractedDriver-Train-Validation.zip"
+    }
+  }
+}

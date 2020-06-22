@@ -188,7 +188,7 @@ namespace Repo.Clients.CLI
                 string ResourceAuthors = ResourceSpecDoc.DocumentElement.GetElementsByTagName("authors")[0].InnerText;
                 RId.Description = ResourceDescription;
                 RId.Authors = ResourceAuthors;
-                if (!FromRepo) RId.Size = Resources.GetResourceSize(RId.TypeOfResource, RId.ResourceName);
+                if (!FromRepo) RId.Size = Resources.GetResourceSize(RId.TypeOfResource, RId.ResourceName, RId.IsZipResource);
                 if (!ListOfResourceLocallyAdded[RType].ContainsKey(ResourceName)) ListOfResourceLocallyAdded[RType][ResourceName] = RId;
                 TempListOfDependentResourcesAdded = await GetDependentResources(ResourceName, ResourceVersion, RType, ResourceSpecDoc);
                 UpdateDependentResourcesAdded(ref ListOfResourceLocallyAdded, TempListOfDependentResourcesAdded);
@@ -236,7 +236,7 @@ namespace Repo.Clients.CLI
                         DependentResourceSpecDoc = await GetResourceSpec(DependentResourceIdentifier, FromRepo);
                         DependentResourceIdentifier.Description = DependentResourceSpecDoc.DocumentElement.GetElementsByTagName("description")[0].InnerText;
                         DependentResourceIdentifier.Authors = DependentResourceSpecDoc.DocumentElement.GetElementsByTagName("authors")[0].InnerText;
-                        if (!FromRepo) DependentResourceIdentifier.Size = GetResourceSize(DependentResourceIdentifier.TypeOfResource, DependentResourceIdentifier.ResourceName);
+                        if (!FromRepo) DependentResourceIdentifier.Size = GetResourceSize(DependentResourceIdentifier.TypeOfResource, DependentResourceIdentifier.ResourceName, DependentResourceIdentifier.IsZipResource);
                         Out.Add(DependentResourceIdentifier);
                         Out.AddRange(await GetDependentResources(DependentResourceIdentifier, FromRepo));
                     }
@@ -328,13 +328,18 @@ namespace Repo.Clients.CLI
             return GetRepoURL() + "/v3/registration/" + ResourceName + "/" + ResourceVersion + ".json";
         }
 
-        public static IEnumerable<string> GetResourceNames(ResourceType ResouceFileType)
+        public static List<string> GetResourceNames(ResourceType ResouceFileType)
         {
             try
             {
-                IEnumerable<string> ListOut;
-                if (ResouceFileType.Equals(ResourceType.Code)) ListOut = new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateDirectories().Select(dir => dir.Name);
-                else ListOut = new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateFiles().Select(file => file.Name);
+                List<string> ListOut = new List<string>();
+                if (ResouceFileType.Equals(ResourceType.Code)) ListOut.AddRange(new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateDirectories().Select(dir => dir.Name));
+                else if(ResouceFileType.Equals(ResourceType.Data))
+                {
+                    ListOut.AddRange(new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateFiles().Select(file => file.Name));
+                    ListOut.AddRange(new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateDirectories().Select(dir => dir.Name + ".zip"));
+                }
+                else ListOut.AddRange(new DirectoryInfo(ResourceDirPath(ResouceFileType)).EnumerateFiles().Select(file => file.Name));
                 return ListOut;
             }
             catch (System.Exception)
@@ -362,8 +367,9 @@ namespace Repo.Clients.CLI
                 foreach (string resourceName in GetResourceNames(resourceType))
                 {
                     string version = Constants.DefaultNoVersionValue;
-                    string size = GetResourceSize(resourceType, resourceName);
-                    ResourceIdentifier RId = new ResourceIdentifier(resourceName, version, resourceType, size);
+                    ResourceIdentifier RId = new ResourceIdentifier(resourceName, version, resourceType,"0 KB");
+                    string size = GetResourceSize(resourceType, resourceName, RId.IsZipResource);
+                    RId.Size = size;
                     ListOfResourceForSpecificType[resourceName] = RId;
                     Logger.Do(">> " + RId.ResourceName + " " + RId.Version);
                 }
@@ -410,16 +416,30 @@ namespace Repo.Clients.CLI
             return RestOps.AppendQueryInEndPoint(GetRepoSearchURL(), "q", QueryString);
         }
 
-        public static string GetResourceSize(ResourceType TypeOfResource, string ResourceName)
+        public static string GetResourceSize(ResourceType TypeOfResource, string ResourceName, bool IsFolderResource=false)
         {
             try
             {
-                string ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName;
-                if (TypeOfResource.Equals(ResourceType.Code)) ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName + Constants.PathSeperator + ResourceName;
-                if (File.Exists(ResourcePath))
+                if (IsFolderResource)
                 {
-                    FileInfo ResourceInfo = new FileInfo(ResourcePath);
-                    return FSOps.BytesToString(ResourceInfo.Length);
+                    //Assuming you have .zip resource only for folder
+                    string ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName.Substring(0, ResourceName.Length - 4);
+                    if (Directory.Exists(ResourcePath))
+                    {
+                        DirectoryInfo ResourceInfo = new DirectoryInfo(ResourcePath);
+                        long FolderSize = ResourceInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+                        return FSOps.BytesToString(FolderSize);
+                    }
+                }
+                else
+                {
+                    string ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName;
+                    if (TypeOfResource.Equals(ResourceType.Code)) ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName + Constants.PathSeperator + ResourceName;
+                    if (File.Exists(ResourcePath))
+                    {
+                        FileInfo ResourceInfo = new FileInfo(ResourcePath);
+                        return FSOps.BytesToString(ResourceInfo.Length);
+                    }
                 }
             }
             catch (Exception ex)
@@ -437,6 +457,18 @@ namespace Repo.Clients.CLI
                 string ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName;
                 if (TypeOfResource.Equals(ResourceType.Code)) ResourcePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceName + Constants.PathSeperator + ResourceName;
                 Status = File.Exists(ResourcePath);
+                #region zip folder present in data
+                if (!Status && TypeOfResource.Equals(ResourceType.Data))
+                {
+                    if (ResourceName.IndexOf(".zip") == ResourceName.Length - 4)
+                    {                        
+                        string ResourceNameWithoutExtension = ResourceName.Substring(0, ResourceName.Length - 4);
+                        string ResourceFilePath = Resources.ResourceDirPath(TypeOfResource) + Constants.PathSeperator + ResourceNameWithoutExtension;
+                        Status = Directory.Exists(ResourceFilePath);
+                        Logger.Do("IsResourcePresentLocally for zip status " + Status);
+                    }                        
+                }
+                #endregion
             }
             catch (Exception ex)
             {
@@ -444,6 +476,7 @@ namespace Repo.Clients.CLI
             }
             return Status;
         }
+
         public static bool GenerateOutputJSONFile(List<Package> RepoItems, List<ResourceIdentifier> LocalItems,
          string From, string FileName, string actionName, string otherInput)
         {

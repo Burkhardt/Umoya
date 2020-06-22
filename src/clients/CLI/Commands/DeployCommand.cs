@@ -25,7 +25,8 @@ namespace Repo.Clients.CLI.Commands
         [Required]
         [Argument(1, "FolderPath", Description = "Give folder path where you want to deploy repository.")]
         public string FolderPathToDeploy { get; set; }
-         [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
+
+        [Option("-j|--json", "To output in json file i.e. --json myresources.json", CommandOptionType.SingleValue)]
         public string OutputJSONFile { get; set; }
 
         private async Task OnExecuteAsync()
@@ -35,7 +36,7 @@ namespace Repo.Clients.CLI.Commands
                 //Extract folder
                 if(!Directory.Exists(FolderPathToDeploy)) throw new Exception("Folder path is not present");
                 if(!File.Exists(CompressRepoFilePath)) throw new Exception("Given compressed file is not present.");
-                ZipFile.ExtractToDirectory(CompressRepoFilePath, FolderPathToDeploy);
+                //ZipFile.ExtractToDirectory(CompressRepoFilePath, FolderPathToDeploy);
                 Console.PrintActionPerformSuccessfully(Constants.DeployCommandName); 
             }
             catch (Exceptions.ActionNotSuccessfullyPerformException erx) { Logger.Do(erx.Message); }

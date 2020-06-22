@@ -18,8 +18,6 @@ namespace Repo.Clients.CLI
         private static string input = string.Empty;
         private static System.ConsoleColor WarningColor = System.ConsoleColor.Yellow;
         private static System.ConsoleColor ErrorColor = System.ConsoleColor.Red;
-        private static System.ConsoleColor TableHeaderColor = System.ConsoleColor.Yellow;
-        private static System.ConsoleColor TableFrameColor = System.ConsoleColor.White;
         private static System.ConsoleColor QuestionColor = System.ConsoleColor.White;
         private static System.ConsoleColor WriteColor = System.ConsoleColor.White;
         private static System.ConsoleColor TaskPassColor = System.ConsoleColor.Green;

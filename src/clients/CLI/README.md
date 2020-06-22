@@ -3,9 +3,9 @@ UMOYA CLI
 
 UMOYA CLI is one of the Client for Repo. It helps to manage resources for ai projects with command line.
 
-## Installation {TBD}
+## Installation 
 
-### .NET Core 2.2 & higher
+### .NET Core 3.1 & higher
 ```
 dotnet tool install --global umoya
 ```

@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <AssemblyName>umoya</AssemblyName>
@@ -9,20 +9,26 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <DebugType>portable</DebugType>
-    <PackageLicenseUrl>https://github.com/nimeshgit/repo/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/nimeshgit/repo</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/nimeshgit/repo</RepositoryUrl>
+    <License>https://github.com/Umoya-ai/UMOYA/blob/master/LICENSE</License>
+    <PackageProjectUrl>https://github.com/Umoya-ai/UMOYA</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Umoya-ai/UMOYA</RepositoryUrl>
     <PackageTags>umoya</PackageTags>
-    <Version>2.5.0</Version>
+    <Version>2.6.12</Version>
     <ToolCommandName>umoya</ToolCommandName>
-    <Authors>Nimesh</Authors>
+    <Owers>Burkhardt Rainer</Owers>
+    <Authors>Nimesh Vadgama</Authors>
     <Company>Software AG</Company>
     <Product>Umoya</Product>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>1</WarningLevel>
   </PropertyGroup>
 
 
  <ItemGroup>
- <EmbeddedResource Include="EmbeddedResources\umoya-resources.zip" />
+ <EmbeddedResource Include="EmbeddedResources\umoya-resources.zip">
+   <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+ </EmbeddedResource>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
