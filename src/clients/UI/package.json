@@ -11,7 +11,7 @@
   "repository": "github:nimeshgit/umoya",
   "private": true,
   "dependencies": {
-    "bootstrap": "3.3.7",
+    "bootstrap": "3.4.1",
     "commonmark": "^0.27.0",
     "commonmark-react-renderer": "^4.3.4",
     "office-ui-fabric-react": "^6.163.0",
