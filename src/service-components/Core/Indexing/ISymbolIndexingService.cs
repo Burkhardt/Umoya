@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umoya.Core.Indexing
+namespace Umoya.Core
 {
     /// <summary>
     /// The result of attempting to index a symbol package.

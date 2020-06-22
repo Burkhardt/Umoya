@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     public class DatabaseOptions
     {
@@ -15,6 +15,8 @@ namespace Umoya.Core.Configuration
         MySql,
         Sqlite,
         SqlServer,
-        PostgreSql
+        PostgreSql,
+
+        AzureTable,
     }
 }

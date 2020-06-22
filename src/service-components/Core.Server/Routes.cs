@@ -1,4 +1,4 @@
-namespace Umoya
+namespace Umoya.Hosting
 {
     public class Routes
     {
@@ -16,6 +16,8 @@ namespace Umoya
         public const string PackageDownloadRouteName = "package-download";
         public const string PackageDownloadManifestRouteName = "package-download-manifest";
         public const string PackageDownloadReadmeRouteName = "package-download-readme";
+        public const string PackageDownloadIconRouteName = "package-download-icon";
         public const string SymbolDownloadRouteName = "symbol-download";
+        public const string PrefixedSymbolDownloadRouteName = "prefixed-symbol-download";
     }
 }

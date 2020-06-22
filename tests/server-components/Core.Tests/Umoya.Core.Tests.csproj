@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Umoya.Core.Tests</AssemblyName>
+    <RootNamespace>Umoya.Core.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\service-components\Core\Umoya.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umoya.Core.Extensions
+namespace Umoya.Core
 {
     public static class StreamExtensions
     {

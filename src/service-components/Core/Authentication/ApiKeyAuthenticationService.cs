@@ -1,9 +1,9 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Core.Authentication
+namespace Umoya.Core
 {
     public class ApiKeyAuthenticationService : IAuthenticationService
     {
@@ -16,7 +16,8 @@ namespace Umoya.Core.Authentication
             _apiKey = string.IsNullOrEmpty(options.Value.ApiKey) ? null : options.Value.ApiKey;
         }
 
-        public Task<bool> AuthenticateAsync(string apiKey) => Task.FromResult(Authenticate(apiKey));
+        public Task<bool> AuthenticateAsync(string apiKey, CancellationToken cancellationToken)
+            => Task.FromResult(Authenticate(apiKey));
 
         private bool Authenticate(string apiKey)
         {

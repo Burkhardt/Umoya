@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     public class StringArrayToJsonConverter : ValueConverter<string[], string>
     {

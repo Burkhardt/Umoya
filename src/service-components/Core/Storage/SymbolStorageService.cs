@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umoya.Core.Storage
+namespace Umoya.Core
 {
     public class SymbolStorageService : ISymbolStorageService
     {

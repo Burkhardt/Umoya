@@ -1,17 +1,12 @@
 using System;
-using Umoya.Configuration;
-using Umoya.Core.Configuration;
-using Umoya.Core.Entities;
-using Umoya.Extensions;
+using Umoya.Core;
+using Umoya.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
 namespace Umoya
 {
@@ -26,66 +21,49 @@ namespace Umoya
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureBaGet(Configuration, httpServices: true);
+            services.ConfigureHttpServices();
 
             // In production, the UI files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "wwwroot/build";
+                configuration.RootPath = "wwwroot";
             });
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var options = Configuration.Get<UmoyaOptions>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseStatusCodePages();
             }
 
-            // Run migrations if necessary.
-            var options = Configuration.Get<UmoyaOptions>();
-            if (options.RunMigrationsAtStartup)
-            {
-                using (var scope = app.ApplicationServices.CreateScope())
-                {
-                    scope.ServiceProvider
-                        .GetRequiredService<IContext>()
-                        .Database
-                        .Migrate();
-                }
-            }
-
-            app.UsePathBase(options.PathBase);
             app.UseForwardedHeaders();
+            app.UsePathBase(options.PathBase);
+
             app.UseSpaStaticFiles();
 
-            /* Need to resolve path for umoyaportal
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/build")),
-                RequestPath = new PathString("/umoyaportal")
-            });
-            */
+            app.UseRouting();
 
             app.UseCors(ConfigureCorsOptions.CorsPolicy);
+            app.UseOperationCancelledMiddleware();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes
-                    .MapServiceIndexRoutes()
-                    .MapPackagePublishRoutes()
-                    .MapSymbolRoutes()
-                    .MapSearchRoutes()
-                    .MapPackageMetadataRoutes()
-                    .MapPackageContentRoutes();
+                endpoints.MapServiceIndexRoutes();
+                endpoints.MapPackagePublishRoutes();
+                endpoints.MapSymbolRoutes();
+                endpoints.MapSearchRoutes();
+                endpoints.MapPackageMetadataRoutes();
+                endpoints.MapPackageContentRoutes();
             });
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "../../clients/UI";
+                spa.Options.SourcePath = "../../clients/browser";
 
                 if (env.IsDevelopment())
                 {

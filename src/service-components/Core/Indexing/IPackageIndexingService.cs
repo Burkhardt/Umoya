@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umoya.Core.Indexing
+namespace Umoya.Core
 {
     /// <summary>
     /// The result of attempting to index a package.
@@ -11,7 +11,7 @@ namespace Umoya.Core.Indexing
     public enum PackageIndexingResult
     {
         /// <summary>
-        /// The package is malformed. This may also happen if BaGet is in a corrupted state.
+        /// The package is malformed. This may also happen if Umoya is in a corrupted state.
         /// </summary>
         InvalidPackage,
 

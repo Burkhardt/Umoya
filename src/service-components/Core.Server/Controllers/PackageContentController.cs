@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Content;
-using Umoya.Protocol;
+using Umoya.Core;
+using Umoya.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Versioning;
 
-namespace Umoya.Controllers
+namespace Umoya.Hosting
 {
     /// <summary>
     /// The Package Content resource, used to download content from packages.
@@ -14,9 +14,9 @@ namespace Umoya.Controllers
     /// </summary>
     public class PackageContentController : Controller
     {
-        private readonly IUmoyaPackageContentService _content;
+        private readonly IPackageContentService _content;
 
-        public PackageContentController(IUmoyaPackageContentService content)
+        public PackageContentController(IPackageContentService content)
         {
             _content = content ?? throw new ArgumentNullException(nameof(content));
         }
@@ -78,6 +78,22 @@ namespace Umoya.Controllers
             }
 
             return File(readmeStream, "text/markdown");
+        }
+
+        public async Task<IActionResult> DownloadIconAsync(string id, string version, CancellationToken cancellationToken)
+        {
+            if (!NuGetVersion.TryParse(version, out var nugetVersion))
+            {
+                return NotFound();
+            }
+
+            var iconStream = await _content.GetPackageIconStreamOrNullAsync(id, nugetVersion, cancellationToken);
+            if (iconStream == null)
+            {
+                return NotFound();
+            }
+
+            return File(iconStream, "image/xyz");
         }
     }
 }

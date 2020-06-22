@@ -15,9 +15,9 @@ namespace Repo.Clients.CLI.Commands.Tests
     {
         public static readonly DirectoryInfo TestCurrentDir = new DirectoryInfo(Environment.CurrentDirectory);
         public static readonly DirectoryInfo SrcDir = TestCurrentDir.Parent.Parent.Parent.Parent.Parent.Parent;
-        public static readonly string UmoyaPath = SrcDir.FullName + Constants.PathSeperator + "src" + Constants.PathSeperator + "clients" + Constants.PathSeperator + "CLI" + Constants.PathSeperator + "bin" + Constants.PathSeperator + "release" + Constants.PathSeperator + "netcoreapp2.2" + Constants.PathSeperator + "publish" + Constants.PathSeperator + "umoya.dll";
+        public static readonly string UmoyaPath = SrcDir.FullName + Constants.PathSeperator + "src" + Constants.PathSeperator + "clients" + Constants.PathSeperator + "CLI" + Constants.PathSeperator + "bin" + Constants.PathSeperator + "release" + Constants.PathSeperator + "netcoreapp3.1" + Constants.PathSeperator + "publish" + Constants.PathSeperator + "umoya.dll";
 
-        public static readonly string RepoPath = SrcDir.FullName + Constants.PathSeperator + "src" + Constants.PathSeperator + "service-components" + Constants.PathSeperator + "Umoya" + Constants.PathSeperator + "bin" + Constants.PathSeperator + "Debug" + Constants.PathSeperator + "netcoreapp2.2";
+        public static readonly string RepoPath = SrcDir.FullName + Constants.PathSeperator + "src" + Constants.PathSeperator + "service-components" + Constants.PathSeperator + "Umoya" + Constants.PathSeperator + "bin" + Constants.PathSeperator + "Debug" + Constants.PathSeperator + "netcoreapp3.1";
 
         public static readonly string DotNetCommand = "dotnet";
         public static readonly string UmoyaBinaryFileName = "umoya.dll";

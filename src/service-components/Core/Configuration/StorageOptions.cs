@@ -1,4 +1,4 @@
-namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     public class StorageOptions
     {
@@ -12,5 +12,6 @@ namespace Umoya.Core.Configuration
         AwsS3 = 2,
         GoogleCloud = 3,
         Null = 4,
+        AliyunOss = 5,
     }
 }

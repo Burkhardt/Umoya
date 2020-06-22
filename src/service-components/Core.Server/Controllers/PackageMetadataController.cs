@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Metadata;
-using Umoya.Protocol;
+using Umoya.Core;
+using Umoya.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Versioning;
 
-namespace Umoya.Controllers
+namespace Umoya.Hosting
 {
     /// <summary>
     /// The Package Metadata resource, used to fetch packages' information.
@@ -14,9 +14,9 @@ namespace Umoya.Controllers
     /// </summary>
     public class PackageMetadataController : Controller
     {
-        private readonly IUmoyaPackageMetadataService _metadata;
+        private readonly IPackageMetadataService _metadata;
 
-        public PackageMetadataController(IUmoyaPackageMetadataService metadata)
+        public PackageMetadataController(IPackageMetadataService metadata)
         {
             _metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         }

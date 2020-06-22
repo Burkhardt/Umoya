@@ -1,18 +1,18 @@
 using System;
-using Umoya.Core.ServiceIndex;
+using Umoya.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NuGet.Versioning;
 
-namespace Umoya
+namespace Umoya.Hosting
 {
     // TODO: This should validate the "Host" header against known valid values
-    public class BaGetUrlGenerator : IUmoyaUrlGenerator
+    public class UmoyaUrlGenerator : IUrlGenerator
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LinkGenerator _linkGenerator;
 
-        public BaGetUrlGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
+        public UmoyaUrlGenerator(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
@@ -70,7 +70,7 @@ namespace Umoya
 
         public string GetRegistrationPageUrl(string id, NuGetVersion lower, NuGetVersion upper)
         {
-            // BaGet does not support paging the registration resource.
+            // Umoya does not support paging the registration resource.
             throw new NotImplementedException();
         }
 
@@ -123,6 +123,21 @@ namespace Umoya
                     Id = id,
                     Version = versionString,
                     Id2 = id,
+                });
+        }
+
+        public string GetPackageIconDownloadUrl(string id, NuGetVersion version)
+        {
+            id = id.ToLowerInvariant();
+            var versionString = version.ToNormalizedString().ToLowerInvariant();
+
+            return _linkGenerator.GetUriByRouteValues(
+                _httpContextAccessor.HttpContext,
+                Routes.PackageDownloadIconRouteName,
+                values: new
+                {
+                    Id = id,
+                    Version = versionString
                 });
         }
 

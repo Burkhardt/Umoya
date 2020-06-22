@@ -1,4 +1,4 @@
-﻿namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     // See NuGetGallery.Core's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/PackageDependency.cs
     public class PackageDependency

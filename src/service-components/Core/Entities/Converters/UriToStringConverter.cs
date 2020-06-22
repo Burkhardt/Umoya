@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     public class UriToStringConverter : ValueConverter<Uri, string>
     {

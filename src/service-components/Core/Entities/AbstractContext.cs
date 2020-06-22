@@ -1,8 +1,9 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     public abstract class AbstractContext<TContext> : DbContext, IContext where TContext : DbContext
     {
@@ -31,6 +32,9 @@ namespace Umoya.Core.Entities
 
         public Task<int> SaveChangesAsync() => SaveChangesAsync(default);
 
+        public virtual async Task RunMigrationsAsync(CancellationToken cancellationToken)
+            => await Database.MigrateAsync(cancellationToken);
+
         public abstract bool IsUniqueConstraintViolationException(DbUpdateException exception);
 
         public virtual bool SupportsLimitInSubqueries => true;
@@ -47,21 +51,30 @@ namespace Umoya.Core.Entities
         {
             package.HasKey(p => p.Key);
             package.HasIndex(p => p.Id);
-            package.HasIndex(p => new { p.Id, p.VersionString })
+            package.HasIndex(p => new { p.Id, p.NormalizedVersionString })
                 .IsUnique();
 
             package.Property(p => p.Id)
                 .HasMaxLength(MaxPackageIdLength)
                 .IsRequired();
 
-            package.Property(p => p.VersionString)
+            package.Property(p => p.NormalizedVersionString)
                 .HasColumnName("Version")
                 .HasMaxLength(MaxPackageVersionLength)
                 .IsRequired();
 
-            package.Property(p => p.Authors)
-                .HasConversion(StringArrayToJsonConverter.Instance)
+            package.Property(p => p.OriginalVersionString)
+                .HasColumnName("OriginalVersion")
+                .HasMaxLength(MaxPackageVersionLength);
+
+            package.Property(p => p.ReleaseNotes)
+                .HasColumnName("ReleaseNotes")
                 .HasMaxLength(DefaultMaxStringLength);
+
+            package.Property(p => p.Authors)
+                .HasMaxLength(DefaultMaxStringLength)
+                .HasConversion(StringArrayToJsonConverter.Instance)
+                .Metadata.SetValueComparer(StringArrayComparer.Instance);
 
             package.Property(p => p.IconUrl)
                 .HasConversion(UriToStringConverter.Instance)
@@ -80,8 +93,9 @@ namespace Umoya.Core.Entities
                 .HasMaxLength(DefaultMaxStringLength);
 
             package.Property(p => p.Tags)
+                .HasMaxLength(DefaultMaxStringLength)
                 .HasConversion(StringArrayToJsonConverter.Instance)
-                .HasMaxLength(DefaultMaxStringLength);
+                .Metadata.SetValueComparer(StringArrayComparer.Instance);
 
             package.Property(p => p.Description).HasMaxLength(DefaultMaxStringLength);
             package.Property(p => p.Language).HasMaxLength(MaxPackageLanguageLength);
@@ -95,6 +109,7 @@ namespace Umoya.Core.Entities
             package.Ignore(p => p.LicenseUrlString);
             package.Ignore(p => p.ProjectUrlString);
             package.Ignore(p => p.RepositoryUrlString);
+
             package.HasMany(p => p.PackageTypes)
                 .WithOne(d => d.Package)
                 .IsRequired();

@@ -2,33 +2,24 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using Umoya.Core.Authentication;
-using Umoya.Core.Configuration;
-using Umoya.Core.Content;
-using Umoya.Core.Entities;
-using Umoya.Core.Extensions;
-using Umoya.Core.Indexing;
-using Umoya.Core.Metadata;
-using Umoya.Core.Mirror;
-using Umoya.Core.Search;
-using Umoya.Core.Server.Extensions;
-using Umoya.Core.ServiceIndex;
-using Umoya.Core.Storage;
+using Umoya.Core;
 using Umoya.Database.Sqlite;
+using Umoya.Hosting;
 using Umoya.Protocol;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Extensions
+namespace Umoya
 {
+    // TODO: Move this to Umoya.Core
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBaGet(
+        public static IServiceCollection AddBaGet(
             this IServiceCollection services,
-            IConfiguration configuration,
-            bool httpServices = false)
+            IConfiguration configuration)
         {
             services.ConfigureAndValidate<UmoyaOptions>(configuration);
             services.ConfigureAndValidate<SearchOptions>(configuration.GetSection(nameof(UmoyaOptions.Search)));
@@ -36,24 +27,39 @@ namespace Umoya.Extensions
             services.ConfigureAndValidate<StorageOptions>(configuration.GetSection(nameof(UmoyaOptions.Storage)));
             services.ConfigureAndValidate<DatabaseOptions>(configuration.GetSection(nameof(UmoyaOptions.Database)));
             services.ConfigureAndValidate<FileSystemStorageOptions>(configuration.GetSection(nameof(UmoyaOptions.Storage)));
-            
 
-            if (httpServices)
-            {
-                services.ConfigureHttpServices();
-            }
+            
+            
+            services.ConfigureIis(configuration);
 
             services.AddBaGetContext();
 
-            services.AddTransient<IPackageService, PackageService>();
+            services.AddTransient<IUrlGenerator, UmoyaUrlGenerator>();
+
+            services.AddTransient<IPackageService>(provider =>
+            {
+                var databaseOptions = provider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>();
+
+                switch (databaseOptions.Value.Type)
+                {
+                    case DatabaseType.Sqlite:                    
+                        return new PackageService(provider.GetRequiredService<IContext>());
+
+                  
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported database provider: {databaseOptions.Value.Type}");
+                }
+            });
+
             services.AddTransient<IPackageIndexingService, PackageIndexingService>();
             services.AddTransient<IPackageDeletionService, PackageDeletionService>();
             services.AddTransient<ISymbolIndexingService, SymbolIndexingService>();
-            services.AddTransient<IUmoyaServiceIndex, UmoyaServiceIndex>();
-            services.AddTransient<IUmoyaPackageContentService, DatabasePackageContentService>();
-            services.AddTransient<IUmoyaPackageMetadataService, DatabasePackageMetadataService>();
-            services.AddTransient<IUmoyaUrlGenerator, BaGetUrlGenerator>();
+            services.AddTransient<IServiceIndexService, UmoyaServiceIndex>();
+            services.AddTransient<IPackageContentService, DefaultPackageContentService>();
+            services.AddTransient<IPackageMetadataService, DefaultPackageMetadataService>();
             services.AddSingleton<IFrameworkCompatibilityService, FrameworkCompatibilityService>();
+            services.AddSingleton<RegistrationBuilder>();
             services.AddMirrorServices();
 
             services.AddStorageProviders();
@@ -88,11 +94,29 @@ namespace Umoya.Extensions
 
                 options.UseSqlite(databaseOptions.Value.ConnectionString);
             });
-
+            
 
             return services;
         }
 
+        
+
+        
+        
+        
+        public static IServiceCollection ConfigureIis(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.Configure<IISServerOptions>(iis =>
+            {
+                iis.MaxRequestBodySize = 262144000;
+            });
+
+            services.ConfigureAndValidate<IISServerOptions>(configuration.GetSection(nameof(IISServerOptions)));
+
+            return services;
+        }
 
         public static IServiceCollection AddStorageProviders(this IServiceCollection services)
         {
@@ -101,7 +125,6 @@ namespace Umoya.Extensions
             services.AddTransient<IPackageStorageService, PackageStorageService>();
             services.AddTransient<ISymbolStorageService, SymbolStorageService>();
 
-    
 
             services.AddTransient<IStorageService>(provider =>
             {
@@ -112,9 +135,11 @@ namespace Umoya.Extensions
                     case StorageType.FileSystem:
                         return provider.GetRequiredService<FileStorageService>();
 
+                    
                     case StorageType.Null:
                         return provider.GetRequiredService<NullStorageService>();
 
+                   
                     default:
                         throw new InvalidOperationException(
                             $"Unsupported storage service: {options.Value.Storage.Type}");
@@ -126,28 +151,59 @@ namespace Umoya.Extensions
 
         public static IServiceCollection AddSearchProviders(this IServiceCollection services)
         {
-            services.AddTransient<IUmoyaSearchService>(provider =>
+            services.AddTransient<ISearchService>(provider =>
             {
-                var options = provider.GetRequiredService<IOptionsSnapshot<SearchOptions>>();
+                var searchOptions = provider.GetRequiredService<IOptionsSnapshot<SearchOptions>>();
 
-                switch (options.Value.Type)
+                switch (searchOptions.Value.Type)
                 {
                     case SearchType.Database:
-                        return provider.GetRequiredService<DatabaseSearchService>();
+                        var databaseOptions = provider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>();
 
+                        switch (databaseOptions.Value.Type)
+                        {
+                            
+                            case DatabaseType.Sqlite:                            
+                                return provider.GetRequiredService<DatabaseSearchService>();
 
+                        
+                            default:
+                                throw new InvalidOperationException(
+                                    $"Database type '{databaseOptions.Value.Type}' cannot be used with " +
+                                    $"search type '{searchOptions.Value.Type}'");
+                        }
+
+                    
                     case SearchType.Null:
                         return provider.GetRequiredService<NullSearchService>();
 
                     default:
                         throw new InvalidOperationException(
-                            $"Unsupported search service: {options.Value.Type}");
+                            $"Unsupported search service: {searchOptions.Value.Type}");
+                }
+            });
+
+            services.AddTransient<ISearchIndexer>(provider =>
+            {
+                var searchOptions = provider.GetRequiredService<IOptionsSnapshot<SearchOptions>>();
+
+                switch (searchOptions.Value.Type)
+                {
+                    case SearchType.Null:
+                    case SearchType.Database:
+                        return provider.GetRequiredService<NullSearchIndexer>();
+
+                 
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported search service: {searchOptions.Value.Type}");
                 }
             });
 
             services.AddTransient<DatabaseSearchService>();
             services.AddSingleton<NullSearchService>();
-
+            services.AddSingleton<NullSearchIndexer>();
+          
             return services;
         }
 
@@ -157,7 +213,7 @@ namespace Umoya.Extensions
         /// <param name="services">The defined services.</param>
         public static IServiceCollection AddMirrorServices(this IServiceCollection services)
         {
-            services.AddTransient<FakeMirrorService>();
+            services.AddTransient<NullMirrorService>();
             services.AddTransient<MirrorService>();
 
             services.AddTransient<IMirrorService>(provider =>
@@ -166,7 +222,7 @@ namespace Umoya.Extensions
 
                 if (!options.Value.Enabled)
                 {
-                    return provider.GetRequiredService<FakeMirrorService>();
+                    return provider.GetRequiredService<NullMirrorService>();
                 }
                 else
                 {
@@ -174,21 +230,16 @@ namespace Umoya.Extensions
                 }
             });
 
-            services.AddTransient<IPackageContentService, PackageContentClient>();
-            services.AddTransient<IPackageMetadataService, PackageMetadataClient>();
-            services.AddTransient<IUrlGeneratorFactory, UrlGeneratorClientFactory>();
-
-            services.AddSingleton<IServiceIndex>(provider =>
+            services.AddSingleton<NuGetClient>();
+            services.AddSingleton(provider =>
             {
                 var httpClient = provider.GetRequiredService<HttpClient>();
                 var options = provider.GetRequiredService<IOptions<MirrorOptions>>();
 
-                return new ServiceIndexClient(
+                return new NuGetClientFactory(
                     httpClient,
                     options.Value.PackageSource.ToString());
             });
-
-            services.AddTransient<IPackageDownloader, PackageDownloader>();
 
             services.AddSingleton(provider =>
             {
@@ -209,8 +260,8 @@ namespace Umoya.Extensions
                 return client;
             });
 
-            services.AddSingleton<DownloadsImporter>();
-            services.AddSingleton<IPackageDownloadsSource, PackageDownloadsJsonSource>();
+            services.AddScoped<DownloadsImporter>();
+            services.AddScoped<IPackageDownloadsSource, PackageDownloadsJsonSource>();
 
             return services;
         }

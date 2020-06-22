@@ -2,11 +2,9 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Configuration;
-using Umoya.Core.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Core.Storage
+namespace Umoya.Core
 {
     /// <summary>
     /// Stores content on disk.

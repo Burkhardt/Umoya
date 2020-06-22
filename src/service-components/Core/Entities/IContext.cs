@@ -1,8 +1,9 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     public interface IContext
     {
@@ -22,6 +23,14 @@ namespace Umoya.Core.Entities
         /// </summary>
         bool SupportsLimitInSubqueries { get; }
 
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Applies any pending migrations for the context to the database.
+        /// Creates the database if it does not already exist.
+        /// </summary>
+        /// <param name="cancellationToken">A token to cancel the task.</param>
+        /// <returns>A task that completes once migrations are applied.</returns>
+        Task RunMigrationsAsync(CancellationToken cancellationToken);
     }
 }

@@ -14,24 +14,33 @@ namespace Umoya.Database.Sqlite.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+                .HasAnnotation("ProductVersion", "3.1.1");
 
-            modelBuilder.Entity("Umoya.Core.Entities.Package", b =>
+            modelBuilder.Entity("Umoya.Core.Package", b =>
                 {
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Authors")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
                     b.Property<string>("Description")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
-                    b.Property<long>("Downloads");
+                    b.Property<long>("Downloads")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<bool>("HasReadme");
+                    b.Property<bool>("HasEmbeddedIcon")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HasReadme")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("IconUrl")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
                     b.Property<string>("Id")
@@ -39,77 +48,107 @@ namespace Umoya.Database.Sqlite.Migrations
                         .HasColumnType("TEXT COLLATE NOCASE")
                         .HasMaxLength(128);
 
-                    b.Property<bool>("IsPrerelease");
+                    b.Property<bool>("IsPrerelease")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Language")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(20);
 
                     b.Property<string>("LicenseUrl")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
-                    b.Property<bool>("Listed");
+                    b.Property<bool>("Listed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("MinClientVersion")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(44);
 
+                    b.Property<string>("NormalizedVersionString")
+                        .IsRequired()
+                        .HasColumnName("Version")
+                        .HasColumnType("TEXT COLLATE NOCASE")
+                        .HasMaxLength(64);
+
+                    b.Property<string>("OriginalVersionString")
+                        .HasColumnName("OriginalVersion")
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(64);
+
                     b.Property<string>("ProjectUrl")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
-                    b.Property<DateTime>("Published");
+                    b.Property<DateTime>("Published")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReleaseNotes")
+                        .HasColumnName("ReleaseNotes")
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(4000);
 
                     b.Property<string>("RepositoryType")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(100);
 
                     b.Property<string>("RepositoryUrl")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
-                    b.Property<bool>("RequireLicenseAcceptance");
+                    b.Property<bool>("RequireLicenseAcceptance")
+                        .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("BLOB");
 
-                    b.Property<int>("SemVerLevel");
+                    b.Property<int>("SemVerLevel")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Summary")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
                     b.Property<string>("Tags")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(4000);
 
                     b.Property<string>("Title")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
-
-                    b.Property<string>("VersionString")
-                        .IsRequired()
-                        .HasColumnName("Version")
-                        .HasMaxLength(64);
 
                     b.HasKey("Key");
 
                     b.HasIndex("Id");
 
-                    b.HasIndex("Id", "VersionString")
+                    b.HasIndex("Id", "NormalizedVersionString")
                         .IsUnique();
 
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.PackageDependency", b =>
+            modelBuilder.Entity("Umoya.Core.PackageDependency", b =>
                 {
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Id")
                         .HasColumnType("TEXT COLLATE NOCASE")
                         .HasMaxLength(128);
 
-                    b.Property<int?>("PackageKey");
+                    b.Property<int?>("PackageKey")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TargetFramework")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("VersionRange")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.HasKey("Key");
@@ -121,18 +160,21 @@ namespace Umoya.Database.Sqlite.Migrations
                     b.ToTable("PackageDependencies");
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.PackageType", b =>
+            modelBuilder.Entity("Umoya.Core.PackageType", b =>
                 {
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT COLLATE NOCASE")
                         .HasMaxLength(512);
 
-                    b.Property<int>("PackageKey");
+                    b.Property<int>("PackageKey")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Version")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.HasKey("Key");
@@ -144,16 +186,18 @@ namespace Umoya.Database.Sqlite.Migrations
                     b.ToTable("PackageTypes");
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.TargetFramework", b =>
+            modelBuilder.Entity("Umoya.Core.TargetFramework", b =>
                 {
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Moniker")
                         .HasColumnType("TEXT COLLATE NOCASE")
                         .HasMaxLength(256);
 
-                    b.Property<int>("PackageKey");
+                    b.Property<int>("PackageKey")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Key");
 
@@ -164,27 +208,29 @@ namespace Umoya.Database.Sqlite.Migrations
                     b.ToTable("TargetFrameworks");
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.PackageDependency", b =>
+            modelBuilder.Entity("Umoya.Core.PackageDependency", b =>
                 {
-                    b.HasOne("Umoya.Core.Entities.Package", "Package")
+                    b.HasOne("Umoya.Core.Package", "Package")
                         .WithMany("Dependencies")
                         .HasForeignKey("PackageKey");
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.PackageType", b =>
+            modelBuilder.Entity("Umoya.Core.PackageType", b =>
                 {
-                    b.HasOne("Umoya.Core.Entities.Package", "Package")
+                    b.HasOne("Umoya.Core.Package", "Package")
                         .WithMany("PackageTypes")
                         .HasForeignKey("PackageKey")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Umoya.Core.Entities.TargetFramework", b =>
+            modelBuilder.Entity("Umoya.Core.TargetFramework", b =>
                 {
-                    b.HasOne("Umoya.Core.Entities.Package", "Package")
+                    b.HasOne("Umoya.Core.Package", "Package")
                         .WithMany("TargetFrameworks")
                         .HasForeignKey("PackageKey")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

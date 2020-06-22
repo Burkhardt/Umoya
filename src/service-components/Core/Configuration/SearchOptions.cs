@@ -1,4 +1,4 @@
-namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     public class SearchOptions
     {

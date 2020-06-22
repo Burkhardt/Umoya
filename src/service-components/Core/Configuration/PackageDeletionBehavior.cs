@@ -1,7 +1,7 @@
-﻿namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     /// <summary>
-    /// How BaGet should interpret package deletion requests.
+    /// How Umoya should interpret package deletion requests.
     /// See: https://docs.microsoft.com/en-us/nuget/api/package-publish-resource#delete-a-package
     /// </summary>
     public enum PackageDeletionBehavior

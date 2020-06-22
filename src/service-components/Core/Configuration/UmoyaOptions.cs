@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     public class UmoyaOptions
     {
@@ -22,7 +23,7 @@ namespace Umoya.Core.Configuration
         public bool RunMigrationsAtStartup { get; set; } = true;
 
         /// <summary>
-        /// How BaGet should interpret package deletion requests.
+        /// How Umoya should interpret package deletion requests.
         /// </summary>
         public PackageDeletionBehavior PackageDeletionBehavior { get; set; } = PackageDeletionBehavior.Unlist;
 

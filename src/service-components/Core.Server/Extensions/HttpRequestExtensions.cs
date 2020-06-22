@@ -1,10 +1,10 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Extensions;
+using Umoya.Core;
 using Microsoft.AspNetCore.Http;
 
-namespace Umoya.Extensions
+namespace Umoya.Hosting
 {
     public static class HttpRequestExtensions
     {

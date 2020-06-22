@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Umoya.Core.Indexing
+namespace Umoya.Core
 {
     /// <summary>
     /// Used to determine the compatibility matrix between frameworks.

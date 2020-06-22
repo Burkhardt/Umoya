@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Configuration
+namespace Umoya.Hosting
 {
     public class ConfigureCorsOptions : IConfigureOptions<CorsOptions>
     {
@@ -9,6 +9,7 @@ namespace Umoya.Configuration
 
         public void Configure(CorsOptions options)
         {
+            // TODO: Consider disabling this on production builds.
             options.AddPolicy(
                 CorsPolicy,
                 builder => builder.AllowAnyOrigin()

@@ -4,36 +4,30 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Entities;
-using Umoya.Core.Extensions;
-using Umoya.Core.Indexing;
-using Umoya.Core.Metadata;
 using Umoya.Protocol;
+using Umoya.Protocol.Models;
 using Microsoft.Extensions.Logging;
 using NuGet.Versioning;
 
-namespace Umoya.Core.Mirror
+namespace Umoya.Core
 {
     using PackageIdentity = NuGet.Packaging.Core.PackageIdentity;
 
     public class MirrorService : IMirrorService
     {
         private readonly IPackageService _localPackages;
-        private readonly IPackageContentService _upstreamContent;
-        private readonly IPackageMetadataService _upstreamMetadata;
+        private readonly NuGetClient _upstreamClient;
         private readonly IPackageIndexingService _indexer;
         private readonly ILogger<MirrorService> _logger;
 
         public MirrorService(
             IPackageService localPackages,
-            IPackageContentService upstreamContent,
-            IPackageMetadataService upstreamMetadata,
+            NuGetClient upstreamClient,
             IPackageIndexingService indexer,
             ILogger<MirrorService> logger)
         {
             _localPackages = localPackages ?? throw new ArgumentNullException(nameof(localPackages));
-            _upstreamContent = upstreamContent ?? throw new ArgumentNullException(nameof(upstreamContent));
-            _upstreamMetadata = upstreamMetadata ?? throw new ArgumentNullException(nameof(upstreamMetadata));
+            _upstreamClient = upstreamClient ?? throw new ArgumentNullException(nameof(upstreamClient));
             _indexer = indexer ?? throw new ArgumentNullException(nameof(indexer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -42,51 +36,41 @@ namespace Umoya.Core.Mirror
             string id,
             CancellationToken cancellationToken)
         {
-            var response = await _upstreamContent.GetPackageVersionsOrNullAsync(id, cancellationToken);
-            if (response == null)
+            var upstreamVersions = await RunOrNull(
+                id,
+                "versions",
+                () => _upstreamClient.ListPackageVersionsAsync(id, includeUnlisted: true, cancellationToken));
+
+            if (upstreamVersions == null || !upstreamVersions.Any())
             {
                 return null;
             }
 
             // Merge the local package versions into the upstream package versions.
-            var localPackages = await _localPackages.FindAsync(id, includeUnlisted: true);
+            var localPackages = await _localPackages.FindAsync(id, includeUnlisted: true, cancellationToken);
             var localVersions = localPackages.Select(p => p.Version);
 
-            return response.Versions.Concat(localVersions).Distinct().ToList();
+            return upstreamVersions.Concat(localVersions).Distinct().ToList();
         }
 
         public async Task<IReadOnlyList<Package>> FindPackagesOrNullAsync(string id, CancellationToken cancellationToken)
         {
-            var upstreamPackageMetadata = await FindAllUpstreamMetadataOrNull(id, cancellationToken);
-            if (upstreamPackageMetadata == null)
+            var items = await RunOrNull(
+                id,
+                "metadata",
+                () => _upstreamClient.GetPackageMetadataAsync(id, cancellationToken));
+
+            if (items == null || !items.Any())
             {
                 return null;
             }
 
-            var upstreamPackages = upstreamPackageMetadata.Select(ToPackage);
-
-            // Return the upstream packages if there are no local packages matching the package id.
-            var localPackages = await _localPackages.FindAsync(id, includeUnlisted: true);
-            if (!localPackages.Any())
-            {
-                return upstreamPackages.ToList();
-            }
-
-            // Otherwise, merge the local packages into the upstream packages.
-            var result = upstreamPackages.ToDictionary(p => new PackageIdentity(p.Id, p.Version));
-            var local = localPackages.ToDictionary(p => new PackageIdentity(p.Id, p.Version));
-
-            foreach (var localPackage in local)
-            {
-                result[localPackage.Key] = localPackage.Value;
-            }
-
-            return result.Values.ToList();
+            return items.Select(ToPackage).ToList();
         }
 
         public async Task MirrorAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
-            if (await _localPackages.ExistsAsync(id, version))
+            if (await _localPackages.ExistsAsync(id, version, cancellationToken))
             {
                 return;
             }
@@ -109,24 +93,24 @@ namespace Umoya.Core.Mirror
             return new Package
             {
                 Id = metadata.PackageId,
-                Version = metadata.Version,
+                Version = metadata.ParseVersion(),
                 Authors = ParseAuthors(metadata.Authors),
                 Description = metadata.Description,
-                Downloads = metadata.Downloads,
-                HasReadme = metadata.HasReadme,
+                Downloads = 0,
+                HasReadme = false,
                 Language = metadata.Language,
-                Listed = metadata.Listed,
+                Listed = metadata.IsListed(),
                 MinClientVersion = metadata.MinClientVersion,
-                Published = metadata.Published,
+                Published = metadata.Published.UtcDateTime,
                 RequireLicenseAcceptance = metadata.RequireLicenseAcceptance,
                 Summary = metadata.Summary,
                 Title = metadata.Title,
                 IconUrl = ParseUri(metadata.IconUrl),
                 LicenseUrl = ParseUri(metadata.LicenseUrl),
                 ProjectUrl = ParseUri(metadata.ProjectUrl),
-                PackageTypes = ParsePackageTypes(metadata.PackageTypes),
-                RepositoryUrl = ParseUri(metadata.RepositoryUrl),
-                RepositoryType = metadata.RepositoryType,
+                PackageTypes = new List<PackageType>(),
+                RepositoryUrl = null,
+                RepositoryType = null,
                 Tags = metadata.Tags.ToArray(),
 
                 Dependencies = FindDependencies(metadata)
@@ -155,18 +139,6 @@ namespace Umoya.Core.Mirror
                 .ToArray();
         }
 
-        private List<PackageType> ParsePackageTypes(IReadOnlyList<string> packageTypes)
-        {
-            if (packageTypes == null || packageTypes.Count == 0)
-            {
-                return new List<PackageType>();
-            }
-
-            return packageTypes
-                .Select(t => new PackageType { Name = t, Version = "0.0.0" })
-                .ToList();
-        }
-
         private List<PackageDependency> FindDependencies(PackageMetadata package)
         {
             if ((package.DependencyGroups?.Count ?? 0) == 0)
@@ -181,7 +153,7 @@ namespace Umoya.Core.Mirror
 
         private IEnumerable<PackageDependency> FindDependenciesFromDependencyGroup(DependencyGroupItem group)
         {
-            // BaGet stores a dependency group with no dependencies as a package dependency
+            // Umoya stores a dependency group with no dependencies as a package dependency
             // with no package id nor package version.
             if ((group.Dependencies?.Count ?? 0) == 0)
             {
@@ -204,47 +176,18 @@ namespace Umoya.Core.Mirror
             });
         }
 
-        private async Task<IReadOnlyList<PackageMetadata>> FindAllUpstreamMetadataOrNull(string id, CancellationToken cancellationToken)
+        private async Task<T> RunOrNull<T>(string id, string data, Func<Task<T>> x)
+            where T : class
         {
-            var packageIndex = await _upstreamMetadata.GetRegistrationIndexOrNullAsync(id, cancellationToken);
-            if (packageIndex == null)
+            try
             {
+                return await x();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to mirror package {Package}'s upstream {Data}", id, data);
                 return null;
             }
-
-            var result = new List<PackageMetadata>();
-
-            foreach (var page in packageIndex.Pages)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                // If the package's registration index is too big, it will be split into registration
-                // pages stored at different URLs. We will need to fetch each page's items individually.
-                // We can detect this case as the registration index will have "null" items.
-                var items = page.ItemsOrNull;
-
-                if (items == null)
-                {
-                    var externalPage = await _upstreamMetadata.GetRegistrationPageOrNullAsync(id, page.Lower, page.Upper, cancellationToken);
-
-                    if (externalPage == null || externalPage.ItemsOrNull == null)
-                    {
-                        // This should never happen...
-                        _logger.LogError(
-                            "Missing or invalid registration page for {PackageId}, versions {Lower} to {Upper}",
-                            id,
-                            page.Lower,
-                            page.Upper);
-                        continue;
-                    }
-
-                    items = externalPage.ItemsOrNull;
-                }
-
-                result.AddRange(items.Select(i => i.PackageMetadata));
-            }
-
-            return result;
         }
 
         private async Task IndexFromSourceAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
@@ -260,18 +203,8 @@ namespace Umoya.Core.Mirror
 
             try
             {
-                using (var stream = await _upstreamContent.GetPackageContentStreamOrNullAsync(id, version, cancellationToken))
+                using (var stream = await _upstreamClient.DownloadPackageAsync(id, version, cancellationToken))
                 {
-                    if (stream == null)
-                    {
-                        _logger.LogWarning(
-                            "Failed to download package {PackageId} {PackageVersion}",
-                            id,
-                            version);
-
-                        return;
-                    }
-
                     packageStream = await stream.AsTemporaryFileStreamAsync();
                 }
 
@@ -288,6 +221,15 @@ namespace Umoya.Core.Mirror
                     version,
                     result);
             }
+            catch (PackageNotFoundException)
+            {
+                _logger.LogWarning(
+                    "Failed to download package {PackageId} {PackageVersion}",
+                    id,
+                    version);
+
+                return;
+            }
             catch (Exception e)
             {
                 _logger.LogError(
@@ -295,7 +237,9 @@ namespace Umoya.Core.Mirror
                     "Failed to mirror package {PackageId} {PackageVersion}",
                     id,
                     version);
-
+            }
+            finally
+            {
                 packageStream?.Dispose();
             }
         }

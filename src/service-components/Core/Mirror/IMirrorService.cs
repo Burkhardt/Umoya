@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Entities;
 using NuGet.Versioning;
 
-namespace Umoya.Core.Mirror
+namespace Umoya.Core
 {
     /// <summary>
     /// Indexes packages from an external source.

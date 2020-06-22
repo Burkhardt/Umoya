@@ -1,4 +1,3 @@
-using Umoya.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http.Features;
@@ -7,21 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace Umoya.Core.Server.Extensions
+namespace Umoya.Hosting
 {
     public static class IServiceCollectionExtensions
     {
         public static IServiceCollection ConfigureHttpServices(this IServiceCollection services)
         {
             services
-                .AddMvc()
-                .AddApplicationPart(typeof(Umoya.Controllers.PackageContentController).Assembly)
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options =>
+                .AddControllers()
+                .AddApplicationPart(typeof(PackageContentController).Assembly)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                 });
-
 
             services.AddCors();
             services.AddHttpContextAccessor();

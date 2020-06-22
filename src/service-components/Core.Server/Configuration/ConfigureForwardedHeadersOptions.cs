@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Configuration
+namespace Umoya.Hosting
 {
     public class ConfigureForwardedHeadersOptions : IConfigureOptions<ForwardedHeadersOptions>
     {

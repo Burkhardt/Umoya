@@ -1,4 +1,4 @@
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
     public enum SemVerLevel
     {

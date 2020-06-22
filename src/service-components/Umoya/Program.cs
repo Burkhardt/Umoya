@@ -1,10 +1,8 @@
-using System;
-using Umoya.Core.Mirror;
-using Umoya.Extensions;
+using System.Threading.Tasks;
+using Umoya.Core;
+using Umoya.Hosting;
 using McMaster.Extensions.CommandLineUtils;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,11 +10,11 @@ namespace Umoya
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var app = new CommandLineApplication
             {
-                Name = "umoya",
+                Name = "baget",
                 Description = "A light-weight NuGet service",
             };
 
@@ -26,46 +24,45 @@ namespace Umoya
             {
                 import.Command("downloads", downloads =>
                 {
-                    downloads.OnExecute(async () =>
+                    downloads.OnExecuteAsync(async cancellationToken =>
                     {
-                        var provider = CreateHostBuilder(args).Build().Services;
+                        var host = CreateHostBuilder(args).Build();
+                        var importer = host.Services.GetRequiredService<DownloadsImporter>();
 
-                        await provider
-                            .GetRequiredService<DownloadsImporter>()
-                            .ImportAsync();
+                        await importer.ImportAsync(cancellationToken);
                     });
                 });
             });
 
-            app.OnExecute(() =>
+            app.OnExecuteAsync(async cancellationToken =>
             {
-                CreateWebHostBuilder(args).Build().Run();
+                var host = CreateWebHostBuilder(args).Build();
+
+                await host.RunMigrationsAsync(cancellationToken);
+                await host.RunAsync(cancellationToken);
             });
 
-            app.Execute(args);
+            await app.ExecuteAsync(args);
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseKestrel(options =>
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            CreateHostBuilder(args)
+                .ConfigureWebHostDefaults(web =>
                 {
-                    options.Limits.MaxRequestBodySize = null;
-                })
-                .ConfigureAppConfiguration((builderContext, config) =>
-                {
-                    var root = Environment.GetEnvironmentVariable("CONFIG_ROOT");
-                    if (!string.IsNullOrEmpty(root))
-                        config.SetBasePath(root);
-                })
-                .UseUrls("http://+:8007");
+                    web.ConfigureKestrel(options =>
+                    {
+                        // Remove the upload limit from Kestrel. If needed, an upload limit can
+                        // be enforced by a reverse proxy server, like IIS.
+                        options.Limits.MaxRequestBodySize = null;
+                    });
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return new HostBuilder()
-                .ConfigureUmoyaConfiguration(args)
-                .ConfigureUmoyaServices()
-                .ConfigureUmoyaLogging();
-        }
+                    web.UseStartup<Startup>();
+                    web.UseUrls("https://+:8007");
+                });
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseBaGet();
+                
     }
 }

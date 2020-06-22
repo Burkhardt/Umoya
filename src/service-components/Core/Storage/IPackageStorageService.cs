@@ -1,14 +1,13 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Entities;
 using NuGet.Versioning;
 
-namespace Umoya.Core.Storage
+namespace Umoya.Core
 {
     /// <summary>
     /// Stores packages' content. Packages' state are stored by the
-    /// <see cref="Metadata.IPackageService"/>.
+    /// <see cref="IPackageService"/>.
     /// </summary>
     public interface IPackageStorageService
     {
@@ -20,6 +19,7 @@ namespace Umoya.Core.Storage
         /// <param name="packageStream">The package's nupkg stream.</param>
         /// <param name="nuspecStream">The package's nuspec stream.</param>
         /// <param name="readmeStream">The package's readme stream, or null if none.</param>
+        /// <param name="iconStream">The package's icon stream, or null if none.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task SavePackageContentAsync(
@@ -27,6 +27,7 @@ namespace Umoya.Core.Storage
             Stream packageStream,
             Stream nuspecStream,
             Stream readmeStream,
+            Stream iconStream,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -55,6 +56,8 @@ namespace Umoya.Core.Storage
         /// <param name="cancellationToken"></param>
         /// <returns>The package's readme stream.</returns>
         Task<Stream> GetReadmeStreamAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
+
+        Task<Stream> GetIconStreamAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
 
         /// <summary>
         /// Remove a package's content from storage. This operation SHOULD succeed

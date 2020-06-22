@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Entities;
-using Umoya.Core.Indexing;
-using Umoya.Core.ServiceIndex;
-using Umoya.Protocol;
+using Umoya.Protocol.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Umoya.Core.Search
+namespace Umoya.Core
 {
-    public class DatabaseSearchService : IUmoyaSearchService
+    public class DatabaseSearchService : ISearchService
     {
         private readonly IContext _context;
         private readonly IFrameworkCompatibilityService _frameworks;
-        private readonly IUmoyaUrlGenerator _url;
+        private readonly IUrlGenerator _url;
 
-        public DatabaseSearchService(IContext context, IFrameworkCompatibilityService frameworks, IUmoyaUrlGenerator url)
+        public DatabaseSearchService(IContext context, IFrameworkCompatibilityService frameworks, IUrlGenerator url)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _frameworks = frameworks ?? throw new ArgumentNullException(nameof(frameworks));
@@ -29,128 +26,200 @@ namespace Umoya.Core.Search
             return Task.CompletedTask;
         }
 
-        public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken)
+        public async Task<SearchResponse> SearchAsync(
+            string query = null,
+            int skip = 0,
+            int take = 20,
+            bool includePrerelease = true,
+            bool includeSemVer2 = true,
+            CancellationToken cancellationToken = default)
         {
-            return await SearchAsync(BaGetSearchRequest.FromSearchRequest(request), cancellationToken);
+            return await SearchAsync(
+                query,
+                skip,
+                take,
+                includePrerelease,
+                includeSemVer2,
+                packageType: null,
+                framework: null,
+                cancellationToken: cancellationToken);
         }
 
-        public async Task<SearchResponse> SearchAsync(BaGetSearchRequest request, CancellationToken cancellationToken)
+        public async Task<SearchResponse> SearchAsync(
+            string query = null,
+            int skip = 0,
+            int take = 20,
+            bool includePrerelease = true,
+            bool includeSemVer2 = true,
+            string packageType = null,
+            string framework = null,
+            CancellationToken cancellationToken = default)
         {
             var result = new List<SearchResult>();
-            var packages = await SearchImplAsync(request, cancellationToken);
+            var packages = await SearchImplAsync(
+                query,
+                skip,
+                take,
+                includePrerelease,
+                includeSemVer2,
+                packageType,
+                framework,
+                cancellationToken);
 
             foreach (var package in packages)
             {
                 var versions = package.OrderByDescending(p => p.Version).ToList();
                 var latest = versions.First();
+                var iconUrl = latest.HasEmbeddedIcon
+                    ? _url.GetPackageIconDownloadUrl(latest.Id, latest.Version)
+                    : latest.IconUrlString;
 
-                var versionResults = versions.Select(p => new SearchResultVersion(
-                    registrationLeafUrl: _url.GetRegistrationLeafUrl(p.Id, p.Version),
-                    p.Version,
-                    p.Downloads,
-                    p.Published));
-
-                result.Add(new SearchResult(
-                    latest.Id,
-                    latest.Version,
-                    latest.Description,
-                    latest.Authors,
-                    latest.IconUrlString,
-                    latest.LicenseUrlString,
-                    latest.ProjectUrlString,
-                    registrationIndexUrl: _url.GetRegistrationIndexUrl(latest.Id),
-                    latest.Summary,
-                    latest.Tags,
-                    latest.Title,
-                    versions.Sum(p => p.Downloads),
-                    versionResults.ToList()));
+                result.Add(new SearchResult
+                {
+                    PackageId = latest.Id,
+                    Version = latest.Version.ToFullString(),
+                    Description = latest.Description,
+                    Authors = latest.Authors,
+                    IconUrl = iconUrl,
+                    LicenseUrl = latest.LicenseUrlString,
+                    ProjectUrl = latest.ProjectUrlString,
+                    RegistrationIndexUrl = _url.GetRegistrationIndexUrl(latest.Id),
+                    Summary = latest.Summary,
+                    Tags = latest.Tags,
+                    Title = latest.Title,
+                    TotalDownloads = versions.Sum(p => p.Downloads),
+                    Versions = versions
+                        .Select(p => new SearchResultVersion
+                        {
+                            RegistrationLeafUrl = _url.GetRegistrationLeafUrl(p.Id, p.Version),
+                            Version = p.Version.ToFullString(),
+                            Downloads = p.Downloads,
+                        })
+                        .ToList()
+                });
             }
 
-            return new SearchResponse(
-                result.Count,
-                result,
-                SearchContext.Default(_url.GetPackageMetadataResourceUrl()));
+            return new SearchResponse
+            {
+                TotalHits = result.Count,
+                Data = result,
+                Context = SearchContext.Default(_url.GetPackageMetadataResourceUrl())
+            };
         }
 
-        public async Task<AutocompleteResponse> AutocompleteAsync(AutocompleteRequest request, CancellationToken cancellationToken)
+        public async Task<AutocompleteResponse> AutocompleteAsync(
+            string query = null,
+            AutocompleteType type = AutocompleteType.PackageIds,
+            int skip = 0,
+            int take = 20,
+            bool includePrerelease = true,
+            bool includeSemVer2 = true,
+            CancellationToken cancellationToken = default)
         {
-           
+            // TODO: Support versions autocomplete.
+            if (type != AutocompleteType.PackageIds) throw new NotImplementedException();
+
             IQueryable<Package> search = _context.Packages;
 
-            if (!string.IsNullOrEmpty(request.Query))
+            if (!string.IsNullOrEmpty(query))
             {
-                var query = request.Query.ToLower();
+                query = query.ToLower();
                 search = search.Where(p => p.Id.ToLower().Contains(query));
             }
 
             var results = await search.Where(p => p.Listed)
                 .OrderByDescending(p => p.Downloads)
-                .Skip(request.Skip)
-                .Take(request.Take)
-                .Select(p => p.Id)
                 .Distinct()
+                .Skip(skip)
+                .Take(take)
+                .Select(p => p.Id)
                 .ToListAsync(cancellationToken);
 
-            return new AutocompleteResponse(
-                results.Count,
-                results,
-                AutocompleteContext.Default);
+            return new AutocompleteResponse
+            {
+                TotalHits = results.Count,
+                Data = results,
+                Context = AutocompleteContext.Default
+            };
         }
 
-        public async Task<DependentsResponse> FindDependentsAsync(DependentsRequest request, CancellationToken cancellationToken)
+        public async Task<DependentsResponse> FindDependentsAsync(
+            string packageId,
+            int skip = 0,
+            int take = 20,
+            CancellationToken cancellationToken = default)
         {
             var results = await _context
                 .Packages
                 .Where(p => p.Listed)
                 .OrderByDescending(p => p.Downloads)
-                .Where(p => p.Dependencies.Any(d => d.Id == request.PackageId))
-                .Skip(request.Skip)
-                .Take(request.Take)
+                .Where(p => p.Dependencies.Any(d => d.Id == packageId))
+                .Skip(skip)
+                .Take(take)
                 .Select(p => p.Id)
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            return new DependentsResponse(results.Count, results);
+            return new DependentsResponse
+            {
+                TotalHits = results.Count,
+                Data = results
+            };
         }
 
         private async Task<List<IGrouping<string, Package>>> SearchImplAsync(
-            BaGetSearchRequest request,
+            string query,
+            int skip,
+            int take,
+            bool includePrerelease,
+            bool includeSemVer2,
+            string packageType,
+            string framework,
             CancellationToken cancellationToken)
         {
-            var frameworks = GetCompatibleFrameworksOrNull(request.Framework);
-            var search = (IQueryable<Package>)_context.Packages.Where(p => p.Listed);
+            var frameworks = GetCompatibleFrameworksOrNull(framework);
+            IQueryable<Package> search = _context.Packages;
 
-            if (!string.IsNullOrEmpty(request.Query))
+            IQueryable<Package> AddSearchFilters(IQueryable<Package> packageQuery)
             {
-                var query = request.Query.ToLower();
+                if (!includePrerelease)
+                {
+                    packageQuery = packageQuery.Where(p => !p.IsPrerelease);
+                }
+
+                if (!includeSemVer2)
+                {
+                    packageQuery = packageQuery.Where(p => p.SemVerLevel != SemVerLevel.SemVer2);
+                }
+
+                if (!string.IsNullOrEmpty(packageType))
+                {
+                    packageQuery = packageQuery.Where(p => p.PackageTypes.Any(t => t.Name == packageType));
+                }
+
+                if (frameworks != null)
+                {
+                    packageQuery = packageQuery.Where(p => p.TargetFrameworks.Any(f => frameworks.Contains(f.Moniker)));
+                }
+
+                packageQuery = packageQuery.Where(p => p.Listed);
+
+                return packageQuery;
+            }
+
+            search = AddSearchFilters(search);
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                query = query.ToLower();
                 search = search.Where(p => p.Id.ToLower().Contains(query));
             }
 
-            if (!request.IncludePrerelease)
-            {
-                search = search.Where(p => !p.IsPrerelease);
-            }
-
-            if (!request.IncludeSemVer2)
-            {
-                search = search.Where(p => p.SemVerLevel != SemVerLevel.SemVer2);
-            }
-
-            if (!string.IsNullOrEmpty(request.PackageType))
-            {
-                search = search.Where(p => p.PackageTypes.Any(t => t.Name == request.PackageType));
-            }
-
-            if (frameworks != null)
-            {
-                search = search.Where(p => p.TargetFrameworks.Any(f => frameworks.Contains(f.Moniker)));
-            }
-
             var packageIds = search.Select(p => p.Id)
-                .OrderBy(id => id)
                 .Distinct()
-                .Skip(request.Skip)
-                .Take(request.Take);
+                .OrderBy(id => id)
+                .Skip(skip)
+                .Take(take);
 
             // This query MUST fetch all versions for each package that matches the search,
             // otherwise the results for a package's latest version may be incorrect.
@@ -169,7 +238,11 @@ namespace Umoya.Core.Search
                 search = _context.Packages.Where(p => packageIdResults.Contains(p.Id));
             }
 
-            return await search.GroupBy(p => p.Id).ToListAsync(cancellationToken);
+            search = AddSearchFilters(search);
+
+            var results = await search.ToListAsync(cancellationToken);
+
+            return results.GroupBy(p => p.Id).ToList();
         }
 
         private IReadOnlyList<string> GetCompatibleFrameworksOrNull(string framework)

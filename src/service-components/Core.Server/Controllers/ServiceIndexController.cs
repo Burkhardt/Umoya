@@ -1,20 +1,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.ServiceIndex;
-using Umoya.Protocol;
+using Umoya.Core;
+using Umoya.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umoya.Controllers
+namespace Umoya.Hosting
 {
     /// <summary>
     /// The NuGet Service Index. This aids NuGet client to discover this server's services.
     /// </summary>
     public class ServiceIndexController : Controller
     {
-        private readonly IUmoyaServiceIndex _serviceIndex;
+        private readonly IServiceIndexService _serviceIndex;
 
-        public ServiceIndexController(IUmoyaServiceIndex serviceIndex)
+        public ServiceIndexController(IServiceIndexService serviceIndex)
         {
             _serviceIndex = serviceIndex ?? throw new ArgumentNullException(nameof(serviceIndex));
         }

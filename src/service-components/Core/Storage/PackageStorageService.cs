@@ -2,11 +2,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Entities;
 using Microsoft.Extensions.Logging;
 using NuGet.Versioning;
 
-namespace Umoya.Core.Storage
+namespace Umoya.Core
 {
     public class PackageStorageService : IPackageStorageService
     {
@@ -16,6 +15,7 @@ namespace Umoya.Core.Storage
         private const string PackageContentType = "binary/octet-stream";
         private const string NuspecContentType = "text/plain";
         private const string ReadmeContentType = "text/markdown";
+        private const string IconContentType = "image/xyz";
 
         private readonly IStorageService _storage;
         private readonly ILogger<PackageStorageService> _logger;
@@ -33,6 +33,7 @@ namespace Umoya.Core.Storage
             Stream packageStream,
             Stream nuspecStream,
             Stream readmeStream,
+            Stream iconStream,
             CancellationToken cancellationToken = default)
         {
             package = package ?? throw new ArgumentNullException(nameof(package));
@@ -40,11 +41,12 @@ namespace Umoya.Core.Storage
             nuspecStream = nuspecStream ?? throw new ArgumentNullException(nameof(nuspecStream));
 
             var lowercasedId = package.Id.ToLowerInvariant();
-            var lowercasedNormalizedVersion = package.VersionString.ToLowerInvariant();
+            var lowercasedNormalizedVersion = package.NormalizedVersionString.ToLowerInvariant();
 
             var packagePath = PackagePath(lowercasedId, lowercasedNormalizedVersion);
             var nuspecPath = NuspecPath(lowercasedId, lowercasedNormalizedVersion);
             var readmePath = ReadmePath(lowercasedId, lowercasedNormalizedVersion);
+            var iconPath = IconPath(lowercasedId, lowercasedNormalizedVersion);
 
             _logger.LogInformation(
                 "Storing package {PackageId} {PackageVersion} at {Path}...",
@@ -63,7 +65,7 @@ namespace Umoya.Core.Storage
                     lowercasedNormalizedVersion,
                     packagePath);
 
-                throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion}");
+                throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} due to conflict");
             }
 
             // Store the package's nuspec.
@@ -83,7 +85,7 @@ namespace Umoya.Core.Storage
                     lowercasedNormalizedVersion,
                     nuspecPath);
 
-                throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} nuspec");
+                throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} nuspec due to conflict");
             }
 
             // Store the package's readme, if one exists.
@@ -105,7 +107,30 @@ namespace Umoya.Core.Storage
                         lowercasedNormalizedVersion,
                         readmePath);
 
-                    throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} readme");
+                    throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} readme due to conflict");
+                }
+            }
+
+            // Store the package's icon, if one exists.
+            if (iconStream != null)
+            {
+                _logger.LogInformation(
+                    "Storing package {PackageId} {PackageVersion} icon at {Path}...",
+                    lowercasedId,
+                    lowercasedNormalizedVersion,
+                    iconPath);
+
+                result = await _storage.PutAsync(iconPath, iconStream, IconContentType, cancellationToken);
+                if (result == StoragePutResult.Conflict)
+                {
+                    // TODO: This should be returned gracefully with an enum.
+                    _logger.LogInformation(
+                        "Could not store package {PackageId} {PackageVersion} icon at {Path} due to conflict",
+                        lowercasedId,
+                        lowercasedNormalizedVersion,
+                        iconPath);
+
+                    throw new InvalidOperationException($"Failed to store package {lowercasedId} {lowercasedNormalizedVersion} icon");
                 }
             }
 
@@ -130,6 +155,11 @@ namespace Umoya.Core.Storage
             return await GetStreamAsync(id, version, ReadmePath, cancellationToken);
         }
 
+        public async Task<Stream> GetIconStreamAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
+        {
+            return await GetStreamAsync(id, version, IconPath, cancellationToken);
+        }
+
         public async Task DeleteAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
             var lowercasedId = id.ToLowerInvariant();
@@ -138,10 +168,12 @@ namespace Umoya.Core.Storage
             var packagePath = PackagePath(lowercasedId, lowercasedNormalizedVersion);
             var nuspecPath = NuspecPath(lowercasedId, lowercasedNormalizedVersion);
             var readmePath = ReadmePath(lowercasedId, lowercasedNormalizedVersion);
+            var iconPath = IconPath(lowercasedId, lowercasedNormalizedVersion);
 
             await _storage.DeleteAsync(packagePath, cancellationToken);
             await _storage.DeleteAsync(nuspecPath, cancellationToken);
             await _storage.DeleteAsync(readmePath, cancellationToken);
+            await _storage.DeleteAsync(iconPath, cancellationToken);
         }
 
         private async Task<Stream> GetStreamAsync(
@@ -154,7 +186,21 @@ namespace Umoya.Core.Storage
             var lowercasedNormalizedVersion = version.ToNormalizedString().ToLowerInvariant();
             var path = pathFunc(lowercasedId, lowercasedNormalizedVersion);
 
-            return await _storage.GetAsync(path, cancellationToken);
+            try
+            {
+                return await _storage.GetAsync(path, cancellationToken);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // The "packages" prefix was lowercased, which was a breaking change
+                // on filesystems that are case sensitive. Handle this case to help
+                // users migrate to the latest version of Umoya.
+                _logger.LogError(
+                    $"Unable to find the '{PackagesPathPrefix}' folder. " +
+                    "If you've recently upgraded Umoya, please make sure this folder starts with a lowercased letter. " +
+                    "For more information, please see https://github.com/Umoya-ai/Umoya");
+                throw;
+            }
         }
 
         private string PackagePath(string lowercasedId, string lowercasedNormalizedVersion)
@@ -182,6 +228,15 @@ namespace Umoya.Core.Storage
                 lowercasedId,
                 lowercasedNormalizedVersion,
                 "readme");
+        }
+
+        private string IconPath(string lowercasedId, string lowercasedNormalizedVersion)
+        {
+            return Path.Combine(
+                PackagesPathPrefix,
+                lowercasedId,
+                lowercasedNormalizedVersion,
+                "icon");
         }
     }
 }

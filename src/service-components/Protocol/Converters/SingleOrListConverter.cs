@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Umoya.Protocol.Converters
+namespace Umoya.Protocol.Internal
 {
     /// <summary>
     /// Converts a single value or a list of values into the desired type or <see cref="List{T}"/>.
     /// </summary>
     /// <typeparam name="T">The desired type.</typeparam>
-    public class SingleOrListConverter<T> : JsonConverter
+    internal class SingleOrListConverter<T> : JsonConverter
     {
         /// <inheritdoc />
         public override bool CanConvert(Type objectType)

@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umoya.Core.Storage
+namespace Umoya.Core
 {
     /// <summary>
     /// Stores the content of symbols, also known as PDBs.

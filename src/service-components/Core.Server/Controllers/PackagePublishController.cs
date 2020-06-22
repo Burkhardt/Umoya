@@ -1,17 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Authentication;
-using Umoya.Core.Configuration;
-using Umoya.Core.Indexing;
-using Umoya.Core.Metadata;
-using Umoya.Extensions;
+using Umoya.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Versioning;
 
-namespace Umoya.Controllers
+namespace Umoya.Hosting
 {
     public class PackagePublishController : Controller
     {
@@ -42,7 +38,7 @@ namespace Umoya.Controllers
         public async Task Upload(CancellationToken cancellationToken)
         {
             if (_options.Value.IsReadOnlyMode ||
-                !await _authentication.AuthenticateAsync(Request.GetApiKey()))
+                !await _authentication.AuthenticateAsync(Request.GetApiKey(), cancellationToken))
             {
                 HttpContext.Response.StatusCode = 401;
                 return;
@@ -97,7 +93,7 @@ namespace Umoya.Controllers
                 return NotFound();
             }
 
-            if (!await _authentication.AuthenticateAsync(Request.GetApiKey()))
+            if (!await _authentication.AuthenticateAsync(Request.GetApiKey(), cancellationToken))
             {
                 return Unauthorized();
             }
@@ -113,7 +109,7 @@ namespace Umoya.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Relist(string id, string version)
+        public async Task<IActionResult> Relist(string id, string version, CancellationToken cancellationToken)
         {
             if (_options.Value.IsReadOnlyMode)
             {
@@ -125,12 +121,12 @@ namespace Umoya.Controllers
                 return NotFound();
             }
 
-            if (!await _authentication.AuthenticateAsync(Request.GetApiKey()))
+            if (!await _authentication.AuthenticateAsync(Request.GetApiKey(), cancellationToken))
             {
                 return Unauthorized();
             }
 
-            if (await _packages.RelistPackageAsync(id, nugetVersion))
+            if (await _packages.RelistPackageAsync(id, nugetVersion, cancellationToken))
             {
                 return Ok();
             }

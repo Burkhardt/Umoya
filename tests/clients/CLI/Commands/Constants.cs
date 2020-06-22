@@ -51,7 +51,7 @@ namespace Repo.Clients.CLI.Commands.Tests
 
         public static readonly string ZmodResourceConfiguration = ZmodDefaultHome + Constants.PathSeperator + "zmod.json";
 
-        public static readonly string DefaultSourceURL = "http://localhost:8007/v3/index.json";
+        public static readonly string DefaultSourceURL = "https://localhost:8007/v3/index.json";
 
         public static readonly string DefaultSourceAccessKey = "NoAPIKey";
 

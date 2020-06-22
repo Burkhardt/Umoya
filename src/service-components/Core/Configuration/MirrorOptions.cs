@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Umoya.Core.Configuration
+namespace Umoya.Core
 {
     public class MirrorOptions : IValidatableObject
     {

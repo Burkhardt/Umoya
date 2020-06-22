@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Storage;
 
-namespace Umoya.Core.Search
+namespace Umoya.Core
 {
     /// <summary>
     /// A minimal storage implementation, used for advanced scenarios.

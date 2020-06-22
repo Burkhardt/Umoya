@@ -1,16 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Authentication;
-using Umoya.Core.Configuration;
-using Umoya.Core.Indexing;
-using Umoya.Core.Storage;
-using Umoya.Extensions;
+using Umoya.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Umoya.Controllers
+namespace Umoya.Hosting
 {
     public class SymbolController : Controller
     {
@@ -37,7 +33,7 @@ namespace Umoya.Controllers
         // See: https://docs.microsoft.com/en-us/nuget/api/package-publish-resource#push-a-package
         public async Task Upload(CancellationToken cancellationToken)
         {
-            if (_options.Value.IsReadOnlyMode || !await _authentication.AuthenticateAsync(Request.GetApiKey()))
+            if (_options.Value.IsReadOnlyMode || !await _authentication.AuthenticateAsync(Request.GetApiKey(), cancellationToken))
             {
                 HttpContext.Response.StatusCode = 401;
                 return;

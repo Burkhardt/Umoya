@@ -1,5 +1,6 @@
-namespace Umoya.Core.Entities
+namespace Umoya.Core
 {
+    // See NuGetGallery.Core's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/PackageType.cs
     public class PackageType
     {
         public int Key { get; set; }

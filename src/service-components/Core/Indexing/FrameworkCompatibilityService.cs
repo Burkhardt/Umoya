@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NuGet.Frameworks;
 
-namespace Umoya.Core.Indexing
+namespace Umoya.Core
 {
     using static NuGet.Frameworks.FrameworkConstants;
 

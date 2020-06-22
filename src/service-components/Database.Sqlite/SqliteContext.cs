@@ -1,4 +1,4 @@
-using Umoya.Core.Entities;
+using Umoya.Core;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +27,10 @@ namespace Umoya.Database.Sqlite
 
             builder.Entity<Package>()
                 .Property(p => p.Id)
+                .HasColumnType("TEXT COLLATE NOCASE");
+
+            builder.Entity<Package>()
+                .Property(p => p.NormalizedVersionString)
                 .HasColumnType("TEXT COLLATE NOCASE");
 
             builder.Entity<PackageDependency>()

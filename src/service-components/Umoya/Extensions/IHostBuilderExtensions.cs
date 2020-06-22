@@ -1,44 +1,30 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace Umoya.Extensions
+namespace Umoya
 {
+    // TODO: Move this to Umoya.Hosting.
     public static class IHostBuilderExtensions
     {
-        public static IHostBuilder ConfigureUmoyaConfiguration(this IHostBuilder builder, string[] args)
+        public static IHostBuilder UseBaGet(this IHostBuilder host)
         {
-            return builder.ConfigureAppConfiguration((context, config) =>
+            host.ConfigureServices((context, services) =>
             {
-                config.AddEnvironmentVariables();
+                services.AddBaGet(context.Configuration);
+            });
 
-                config
-                    .SetBasePath(Environment.CurrentDirectory)
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            host.ConfigureAppConfiguration((context, config) =>
+            {
+                var root = Environment.GetEnvironmentVariable("BAGET_CONFIG_ROOT");
 
-                if (args != null)
+                if (!string.IsNullOrEmpty(root))
                 {
-                    config.AddCommandLine(args);
+                    config.SetBasePath(root);
                 }
             });
-        }
 
-        public static IHostBuilder ConfigureUmoyaLogging(this IHostBuilder builder)
-        {
-            return builder
-                .ConfigureLogging((context, logging) =>
-                {
-                    logging.AddConfiguration(context.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.AddDebug();
-                });
-        }
-
-        public static IHostBuilder ConfigureUmoyaServices(this IHostBuilder builder)
-        {
-            return builder
-                .ConfigureServices((context, services) => services.ConfigureBaGet(context.Configuration));
+            return host;
         }
     }
 }

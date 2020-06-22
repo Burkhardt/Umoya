@@ -5,14 +5,13 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
-using Umoya.Core.Extensions;
-using Umoya.Core.Metadata;
-using Umoya.Core.Storage;
 using Microsoft.Extensions.Logging;
 using NuGet.Packaging;
 
-namespace Umoya.Core.Indexing
+namespace Umoya.Core
 {
+    // Based off: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery/Services/SymbolPackageUploadService.cs
+    // Based off: https://github.com/NuGet/NuGet.Jobs/blob/master/src/Validation.Symbols/SymbolsValidatorService.cs#L44
     public class SymbolIndexingService : ISymbolIndexingService
     {
         private static readonly HashSet<string> ValidSymbolPackageContentExtensions = new HashSet<string>
@@ -55,7 +54,7 @@ namespace Umoya.Core.Indexing
                     var packageId = symbolPackage.NuspecReader.GetId();
                     var packageVersion = symbolPackage.NuspecReader.GetVersion();
 
-                    var package = await _packages.FindOrNullAsync(packageId, packageVersion, includeUnlisted: true);
+                    var package = await _packages.FindOrNullAsync(packageId, packageVersion, includeUnlisted: true, cancellationToken);
                     if (package == null)
                     {
                         return SymbolIndexingResult.PackageNotFound;
@@ -139,6 +138,8 @@ namespace Umoya.Core.Indexing
             string pdbPath,
             CancellationToken cancellationToken)
         {
+            // TODO: Validate that the PDB has a corresponding DLL
+            // See: https://github.com/NuGet/NuGet.Jobs/blob/master/src/Validation.Symbols/SymbolsValidatorService.cs#L170
             Stream pdbStream = null;
             PortablePdb result = null;
 
