@@ -10,32 +10,32 @@ Versioning resource(like model, data and code) and manage its dependencies for a
   <img width="100%" src="https://github.com/Umoya-ai/UMOYA/blob/master/docs/media/icons/UmoyaUI.PNG">
 </p>
 
+## Feature(s)
+* Versioning resources like Models, Data and Code with [Semantic specification](https://semver.org) for AI projects in [Software AG MLW](https://github.com/SoftwareAG/MLW).
+* Manange direct and in-direct dependencies for resources.
+* Lightweight Server : Umoya (Repo) Server.
+* Client Tools : CLI, Browser and Rest APIs to perform operations like add, upgrade, delete and publish resources.
+* Cross-platform (i.e. You can use Sever/Client Tools on Windows, Linux or Mac OS) with .net core 3.1.301 (LTS)
+* Dockerized
+* Authenticate and Authorize with Software AG MLW's Identity Server (i.e. OAuth 2.0 RedHat KeyCloak)
+* Supports read-through caching, It can index the entire resources. 
+* Stay tuned, more features are planned with Software AG ZMOD.
+
 ## Getting Started
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download)
 2. Download latest release from [here](https://github.com/nimeshgit/umoya/releases) and extract.
-3. Start the service with `dotnet Repo.dll`
-4. Browse "http://localhost:8007/" in your browser.
-For more information, Please refer to [our documentation](https://zmod.org/).
-
-## Feature(s)
-* Versioning resources like Models, Data and Code with [Semantic specification](https://semver.org) for AI projects in [Software AG ZMOD](https://github.com/SoftwareAG/ZMOD).
-* Manange direct and in-direct dependencies for resources.
-* Lightweight Server : Repo Server
-* Client Tools : CLI, Browser and Rest APIs to perform operations like add, upgrade, delete and publish resources.
-* Cross-platform (i.e. You can use Sever/Client Tools on Windows, Linux or Mac OS)
-* Dockerized
-* Authenticate and Authorize with Software AG ZMOD's Identity Server (i.e. OAuth 2.0 RedHat KeyCloak)
-* Supports read-through caching, It can index the entire resources.
-* Stay tuned, more features are planned with Software AG ZMOD.
+3. Start the service with `dotnet Umoya.dll`
+4. Browse "https://localhost:8007/" in your browser.
+For more information, Please refer to [our documentation](https://mlw.ai/).
 
 ## Development
 1. Install [.NET Core SDK](https://www.microsoft.com/net/download) and [Node.js](https://nodejs.org/)
 2. Do clone of master branch.
-3. Navigate to `clients\UI\src`
+3. Navigate to `clients\browser\src`
 4. Install the frontend's dependencies with `npm install`
 5. Navigate to `service-components\Umoya`
 6. Start the service with `dotnet run`
-7. Open the URL `http://localhost:8007/` in your browser
+7. Open the URL `https://localhost:8007/` in your browser
 
 ## Resources
 *  To do testing, You can setup baseline test-data (resource types i.e. Models, Data and Code) from [Here](https://github.com/nimeshgit/umoya-resources).
