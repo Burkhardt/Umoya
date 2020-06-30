@@ -55,7 +55,7 @@
 
   <Target Name="ResolveUIPublishForUbuntu" BeforeTargets="Publish" Condition=" '$(IsLinux)' == 'true'">
     <Message Text="Resolving Umoya Browser UI dependecies (ubuntu) for Publish" Importance="high" />
-    <Exec Command="mv ../../clients/browser/build  $(PublishDir)/wwwroot" />
+    <Exec Command="cp -a ../../clients/browser/build/.  $(PublishDir)/wwwroot/" />
   </Target>
 
   <Target Name="ResolveUIPublishForWindow" BeforeTargets="Publish" Condition=" '$(IsWindows)' == 'true'">

@@ -64,7 +64,7 @@ namespace Umoya.Tests
         {
             var hostBuilder = Host.CreateDefaultBuilder();
 
-            hostBuilder.UseBaGet();
+            hostBuilder.UseUmoya();
             hostBuilder.ConfigureAppConfiguration((ctx, config) =>
             {
                 config.AddInMemoryCollection(configs ?? new Dictionary<string, string>());

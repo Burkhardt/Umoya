@@ -5,6 +5,9 @@ using McMaster.Extensions.CommandLineUtils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
 namespace Umoya
 {
@@ -14,25 +17,9 @@ namespace Umoya
         {
             var app = new CommandLineApplication
             {
-                Name = "baget",
-                Description = "A light-weight NuGet service",
+                Name = "Umoya",
+                Description = "The spirit of Machine Learning and Deep Learning. Versioning resource(like model, data and code) and manage its dependencies for ai projects.",
             };
-
-            app.HelpOption(inherited: true);
-
-            app.Command("import", import =>
-            {
-                import.Command("downloads", downloads =>
-                {
-                    downloads.OnExecuteAsync(async cancellationToken =>
-                    {
-                        var host = CreateHostBuilder(args).Build();
-                        var importer = host.Services.GetRequiredService<DownloadsImporter>();
-
-                        await importer.ImportAsync(cancellationToken);
-                    });
-                });
-            });
 
             app.OnExecuteAsync(async cancellationToken =>
             {
@@ -41,8 +28,7 @@ namespace Umoya
                 await host.RunMigrationsAsync(cancellationToken);
                 await host.RunAsync(cancellationToken);
             });
-
-            await app.ExecuteAsync(args);
+            await app.ExecuteAsync(args);          
         }
 
         public static IHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -55,14 +41,12 @@ namespace Umoya
                         // be enforced by a reverse proxy server, like IIS.
                         options.Limits.MaxRequestBodySize = null;
                     });
-
                     web.UseStartup<Startup>();
-                    web.UseUrls("https://+:8007");
+                    web.UseUrls("https://+;http://+");
                 });
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseBaGet();
+            Host.CreateDefaultBuilder(args).UseUmoya();
                 
     }
 }

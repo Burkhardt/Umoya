@@ -17,7 +17,7 @@ namespace Umoya
     // TODO: Move this to Umoya.Core
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection AddBaGet(
+        public static IServiceCollection AddUmoya(
             this IServiceCollection services,
             IConfiguration configuration)
         {
@@ -32,7 +32,7 @@ namespace Umoya
             
             services.ConfigureIis(configuration);
 
-            services.AddBaGetContext();
+            services.AddUmoyaContext();
 
             services.AddTransient<IUrlGenerator, UmoyaUrlGenerator>();
 
@@ -69,7 +69,7 @@ namespace Umoya
             return services;
         }
 
-        public static IServiceCollection AddBaGetContext(this IServiceCollection services)
+        public static IServiceCollection AddUmoyaContext(this IServiceCollection services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
