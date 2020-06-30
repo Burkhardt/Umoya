@@ -1,8 +1,9 @@
-FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 WORKDIR /app
-EXPOSE 8007
+EXPOSE 80
+EXPOSE 443
 
-FROM microsoft/dotnet:2.2-sdk AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1.301-bionic AS build
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get install -y nodejs
 WORKDIR /src
@@ -12,7 +13,6 @@ RUN dotnet build ./service-components/Umoya -c Release -o /app
 
 FROM build AS publish
 RUN dotnet publish ./service-components/Umoya -c Release -o /app
-
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
