@@ -42,7 +42,7 @@ namespace Umoya
                         options.Limits.MaxRequestBodySize = null;
                     });
                     web.UseStartup<Startup>();
-                    web.UseUrls("https://+;http://+");
+                    web.UseUrls("https://+:8007;http://+:8006");
                 });
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
